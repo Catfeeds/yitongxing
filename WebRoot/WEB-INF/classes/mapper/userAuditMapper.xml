@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.UserAuditDao">
+
+	<resultMap id="tUserAuditResultMap" type="com.bluemobi.po.UserAudit">
+		<id property="auditid" column="auditid" />
+		<result property="userid" column="userid" />
+		<result property="account" column="account" />
+		<result property="name" column="name" />
+		<result property="age" column="age" />
+		<result property="sex" column="sex" />
+		<result property="education" column="education" />
+		<result property="school" column="school" />
+		<result property="idcardno" column="idcardno" />
+		<result property="specialtyid" column="specialtyid" />
+		<result property="languageid" column="languageid" />
+		<result property="countryid" column="countryid" />
+		<result property="provinceid" column="provinceid" />
+		<result property="cityid" column="cityid" />
+		<result property="passporturl" column="passporturl" />
+		<result property="passporturlmin" column="passporturlmin" />
+		<result property="visaurl" column="visaurl" />
+		<result property="visaurlmin" column="visaurlmin" />
+		<result property="studentupurl" column="studentupurl" />
+		<result property="studentupurlmin" column="studentupurlmin" />
+		<result property="studentdownurl" column="studentdownurl" />
+		<result property="studentdownurlmin" column="studentdownurlmin" />
+		<result property="auditstate" column="auditstate" />
+		<result property="level" column="level" />
+		<result property="createtime" column="createtime" />
+		<result property="remark" column="remark" />
+		
+		<result property="specialtyname" column="specialtyname" />
+		<result property="languagename" column="languagename" />
+		<result property="areaname" column="areaname" />
+		<result property="applytime" column="applytime" />
+		<result property="origin" column="origin" />
+		<result property="phone" column="phone" />
+		<result property="birthdayau" column="birthdayau" />
+	</resultMap>
+	<resultMap id="pageResultMap"  type="java.util.HashMap"/>
+
+	<!-- 获取待审核列表  xiaojin_wu -->
+	<select id="getUserAuditList" parameterType="map" resultMap="pageResultMap">
+	select * from(
+	   select 
+	    auditid,
+	    userid,
+	    account,
+	    name,
+	    sex,
+	    age,
+	    school,
+	    idcardno,
+	    majorid,
+	    (select specialtyname from e_sys_specialty s where s.specialtyid=t.majorid) specialtyname,
+	    needlanguageid,
+	    provinceid,
+	    cityid,
+	    concat((select a.areaname from e_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from e_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from e_sys_area a where a.areaid=t.cityid)) areaname,
+		(select education from e_user b where b.userid=t.userid) education,
+	    passporturl,
+	    passporturlmin,
+	    visaurl,
+	    visaurlmin,
+	    auditstate,
+	    level,
+	    createtime,
+	    remark,
+	    date_format(birthdayau,'%Y-%m-%d') birthdayauFormat from e_user_audit t
+	    order by applytime desc ) nc
+	    
+	    limit #{offset},#{rows}
+	</select>
+	
+	
+	<select id="getUserAuditListCount" resultType="java.lang.Integer">
+		select count(*) from(
+	   select 
+	    auditid,
+	    userid,
+	    account,
+	    name,
+	    sex,
+	    age,
+	    school,
+	    idcardno,
+	    majorid,
+	    (select specialtyname from e_sys_specialty s where s.specialtyid=t.majorid) specialtyname,
+	    needlanguageid,
+	    provinceid,
+	    cityid,
+	    concat((select a.areaname from e_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from e_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from e_sys_area a where a.areaid=t.cityid)) areaname,
+	    passporturl,
+	    passporturlmin,
+	    visaurl,
+	    visaurlmin,
+	    auditstate,
+	    level,
+	    createtime,
+	    remark,
+	    date_format(birthdayau,'%Y-%m-%d') birthdayauFormat from e_user_audit t
+	    order by applytime desc ) nc 
+
+	</select>
+	<!-- 通过userid查询用户信息  xiaojin_wu -->
+	<select id="getUserAuditById" parameterType="int" resultMap="tUserAuditResultMap">
+	   select 
+	    auditid,
+	    userid,
+	    account,
+	    name,
+	    sex,
+	    age,
+	    profession,
+	    school,
+	    idcardno,
+	    majorid,
+	    needlanguageid,
+	    countryid,
+	    provinceid,
+	    cityid,
+	    identificationPhoto,
+	    lifePhoto,
+	    auditstate,
+	    level,
+	    createtime,
+	    remark,
+	    applytime,
+	    birthdayau,
+	    origin,
+	    phone,
+		(select a.education from e_user a where t.userid=a.userid) education,
+		(select b.specialtyname from e_sys_specialty b where t.majorid = b.specialtyid) specialtyname
+	    from e_user_audit t
+	    where auditid=#{auditid}
+	</select>
+	<!-- 审核 add by yubin -->
+	<update id="audit" parameterType="map">
+		update t_user set auditstate=#{state} where userid=#{userid}
+	</update>
+	<!-- 审核 add by yubin -->
+	<update id="auditUser" parameterType="map">
+		update t_user_audit set auditstate=#{state}
+		<if test="level != null and level != ''">
+			,level=#{level}
+		</if>
+		where auditid=#{auditid}
+	</update>
+	<!-- 编辑保存  add by yubin -->
+	<update id="save" parameterType="com.bluemobi.po.UserAudit">
+	   update t_user_audit set
+	     name=#{name},
+	     sex=#{sex},
+	     age=#{age},
+	     education=#{education},
+	     school=#{school},
+	     idcardno=#{idcardno},
+	     specialtyid=#{specialtyid},
+	     languageid=#{languageid},
+	     countryid=#{countryid},
+	     provinceid=#{provinceid},
+	     cityid=#{cityid},
+	     passporturl=#{passporturl},
+	     passporturlmin=#{passporturlmin},
+	     visaurl=#{visaurl},
+	     visaurlmin=#{visaurlmin},
+	     studentupurl=#{studentupurl},
+	     studentupurlmin=#{studentupurlmin},
+	     studentdownurl=#{studentdownurl},
+	     studentdownurlmin=#{studentdownurlmin},
+	     level=#{level},
+	     remark=#{remark},
+	     birthdayau=#{birthdayau},
+	     origin=#{origin},
+	     phone=#{phone}
+	   where 
+	    auditid=#{auditid} 
+	</update>
+	
+	<!-- 新增用户  add by yubin -->
+	<insert id="insertUser" parameterType="com.bluemobi.po.User">
+		insert into e_user_audit(
+			account,
+			userid,
+			createtime
+		) values (
+			#{account},
+			#{userid},
+			#{createtime}
+		)
+	</insert>
+	<!-- 获取翻译未审核通过的资料 add by yubin
+	<select id="getUserAuditByUserId" parameterType="map" resultType="com.bluemobi.po.UserAudit">
+	   select 
+	    account,
+	    name,
+	    sex,
+	    age,
+	    education,
+	    school,
+	    idcardno,
+	    specialtyid,
+	    (select specialtyname from t_sys_specialty s where s.specialtyid=t.specialtyid) specialtyname,
+	    languageid,
+	    (select languagename from t_sys_language l where l.languageid=t.languageid) languagename,
+	    countryid,
+	    provinceid,
+	    cityid,
+	    concat((select a.areaname from t_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from t_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from t_sys_area a where a.areaid=t.cityid)) areaname,
+	    passporturl,
+	    passporturlmin,
+	    visaurl,
+	    visaurlmin,
+	    studentupurl,
+	    studentupurlmin,
+	    studentdownurl,
+	    studentdownurlmin,
+	    remark
+	    from t_user_audit t
+	    where t.userid=#{userid} order by applytime desc limit 1
+	</select> -->
+	<!-- 翻译申请和更新个人资料 -->
+	<update id="updateTranUser" parameterType="com.bluemobi.po.User">
+		update e_user_audit set
+			name=#{name},
+			sex=#{sex},
+			age=#{age},
+			account=#{account},
+			school=#{school},
+			specialtyid=#{specialtyid},
+			languageid=#{languageid},
+			countryid=#{countryid},
+			professionid=#{professionid},
+			provinceid=#{provinceid},
+			identificationPhoto=#{identificationPhoto},
+			lifePhoto=#{lifePhoto},
+			auditstate=#{auditstate},
+			remark=#{remark},
+	     	applytime=#{applytime}
+		where userid=#{userid}
+	</update>
+	
+	<!--译员审核 xiaojin_wu -->
+	<update id="auditExamine" parameterType="map">
+		UPDATE e_user_audit SET auditstate = #{auditstate} WHERE auditid=#{auditid}
+	</update>
+	
+	<!--译员审核修改user表数据 xiaojin_wu -->
+	<update id="userToAudiet" parameterType="map">
+		UPDATE e_user set usertype=2 WHERE userid=#{userid}
+	</update>
+</mapper>

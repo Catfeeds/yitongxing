@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.SpecialtyDao">
+
+	<resultMap id="tSysSpecialtyResultMap" type="com.bluemobi.po.Specialty">
+		<id property="specialtyid" column="specialtyid" />
+		<result property="specialtyname" column="specialtyname" />
+		<result property="userid" column="userid" />
+		<result property="createtime" column="createtime" />
+	</resultMap>
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="tSysSpecialtyResultMap"></resultMap>
+	<resultMap id="findResultMap"  type="java.util.HashMap" extends="tSysSpecialtyResultMap"></resultMap>
+
+	<!-- 获取语种列表 add by yubin -->
+	<select id="getList" resultMap="tSysSpecialtyResultMap">
+	   select 
+	    specialtyid,
+	    specialtyname
+	   from t_sys_specialty
+	</select>
+	
+	<insert id="save" parameterType="com.bluemobi.po.Specialty">
+	   insert into t_sys_specialty 
+	   (
+	   	specialtyid,specialtyname,userid,createtime
+	   )values (
+	   	#{specialtyid},
+	   	#{specialtyname},
+	   	#{userid},
+	   	#{createtime}
+	   )
+	</insert>
+	
+	<delete id="del" parameterType="int">
+		delete from t_sys_specialty where specialtyid=#{specialtyid}
+	</delete>
+	
+	<select id="getAll" resultMap="tSysSpecialtyResultMap">
+		select * from t_sys_specialty t order by t.createtime limit #{offset},#{rows}
+	</select>
+	<select id="lxPageCount" parameterType="map" resultType="int">
+		select count(*) from t_sys_specialty
+	</select>
+	<select id="getAllSpecialty" resultMap="findResultMap">
+		select * from e_sys_specialty tss 
+	</select>
+	<select id="selOffOrOn" parameterType="map" resultType="int">
+		select userid from t_user where specialtyid = #{specialtyid}
+	</select>
+	<select id="selYesOrNo" parameterType="map" resultType="int">
+		select auditid from t_user_audit where specialtyid = #{specialtyid}
+	</select>
+	<select id="isExist" parameterType="map" resultType="int">
+		select specialtyid from t_sys_specialty where specialtyname = #{specialtyname}
+	</select>
+</mapper> 

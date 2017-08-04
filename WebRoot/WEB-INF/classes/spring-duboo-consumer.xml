@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">     
+	
+	<dubbo:application name="duboo-consumer" /> 
+
+	<dubbo:registry address="multicast://224.5.6.7:1234" />
+	
+	<!-- 提供服务：【校验token】 -->
+	<dubbo:reference id="tokenService" interface="com.appcore.service.TokenService" />
+	<!-- 菜单 -->
+	<dubbo:reference id="menuService" interface="com.bluemobi.service.MenuService" />
+	<!-- 用户 -->
+	<dubbo:reference id="userService" interface="com.bluemobi.service.UserService" />
+	<!-- 订单 -->
+	<dubbo:reference id="orderService" interface="com.bluemobi.service.OrderService" />
+	<!-- 预约 -->
+	<dubbo:reference id="maketransService" interface="com.bluemobi.service.MaketransService" />
+	<!-- 语种 -->
+	<dubbo:reference id="languageService" interface="com.bluemobi.service.LanguageService" />
+	<!-- 专业 -->
+	<dubbo:reference id="specialtyService" interface="com.bluemobi.service.SpecialtyService" />
+	<!-- 审核 -->
+	<dubbo:reference id="userAuditService" interface="com.bluemobi.service.UserAuditService" />
+	<!-- 文字 -->
+	<dubbo:reference id="wordService" interface="com.bluemobi.service.WordService" />
+	<!-- 区域 -->
+	<dubbo:reference id="areaService" interface="com.bluemobi.service.AreaService" />
+	<!-- 用户反馈 -->
+	<dubbo:reference id="commentService" interface="com.bluemobi.service.CommentService" />
+	<!-- 订单评价 -->
+	<dubbo:reference id="orderCommentService" interface="com.bluemobi.service.OrderCommentService" />
+	<!-- 消息管理 -->
+	<dubbo:reference id="messageService" interface="com.bluemobi.service.MessageService" />
+	<!-- 验证码 -->
+	<dubbo:reference id="validateCodeService" interface="com.bluemobi.service.ValidateCodeService" />
+	<!-- 价格管理 -->
+	<dubbo:reference id="priceService" interface="com.bluemobi.service.PriceService" />
+	<!-- 翻译充值 -->
+	<dubbo:reference id="transPayService" interface="com.bluemobi.service.TransPayService" />
+	<!-- 支付通知 -->
+	<dubbo:reference id="notifyService" interface="com.bluemobi.service.NotifyService" />
+	<!-- 培训 -->
+	<dubbo:reference id="trainService" interface="com.bluemobi.service.TrainService" />
+	<!-- 版本 -->
+	<dubbo:reference id="versionsService" interface="com.bluemobi.service.VersionsService" />
+</beans>

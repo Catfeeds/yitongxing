@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.OrderCommentDao">
+	<resultMap type="java.util.Map" id="tOrderCommentResultMap">
+           <result column="commentid" property="commentid"/>
+           <result column="orderid" property="orderid"/>
+           <result column="content" property="content"/>
+           <result column="createtime" property="createtime"/>
+           <result column="fromuserid" property="fromuserid"/>
+           <result column="name" property="name"/>
+    </resultMap>
+	
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="tOrderCommentResultMap" />
+	<resultMap id="findResultMap"  type="java.util.HashMap" extends="tOrderCommentResultMap" />
+	
+	<select id="getOrderCommentList" resultMap="tOrderCommentResultMap" parameterType="map">
+        select oc.commentid,oc.orderid,oc.content,oc.createtime,oc.fromuserid,u.name
+		from t_order_comment oc left join t_user u on oc.fromuserid = u.userid
+		order by oc.createtime desc
+        limit #{offset},#{rows}
+    </select>
+	
+	
+	<delete id="deleteOrderComment" parameterType="java.lang.String">
+		delete from t_order_comment where commentid=#{commentId}
+	</delete>
+	
+	<select id="getOrderCommentListCount" parameterType="map" resultType="int">
+	   select count(1) from t_order_comment
+	</select>
+	
+	<select id="getOrderCommentById" parameterType="java.lang.String" resultType="map">
+		select distinct o1.orderid,date_format(o1.createtime,'%Y-%m-%d') fromtime,
+		o1.content fromcontent,date_format(o2.createtime,'%Y-%m-%d') totime,o2.content tocontent,
+		u1.name,u1.account,u1.usertype
+		from t_order_comment o1
+		left join t_order_comment o2 on o1.orderid=o2.orderid and o1.commentid&lt;&gt;o2.commentid and o1.fromuserid=o2.touserid
+		left join t_user u1 on o1.fromuserid=u1.userid
+		where o1.commentid=#{commentid}
+		
+	</select>
+	
+	<!-- 添加评价订单 -->
+	<insert id="insertOrderComment" parameterType="map">
+	   insert into e_order_comment (
+	     orderid,
+	     fromuserid,
+	     touserid,
+	     starlevel,
+	     content,
+	     createtime,
+	     usertype
+	   )values (
+	     #{orderId},
+	     #{fromuserid},
+	     #{touserid},
+	     #{starlevel},
+	     #{content},
+	     #{createtime},
+	     #{usertype}
+	   )
+	</insert>
+	
+	
+</mapper> 

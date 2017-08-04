@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.RefundApplyDao">
+
+	<resultMap id="tRefundApplyResultMap" type="com.bluemobi.po.RefundApply">
+		<id property="applyid" column="applyid" />
+		<result property="orderid" column="orderid" />
+		<result property="money" column="money" />
+		<result property="state" column="state" />
+		<result property="applytime" column="applytime" />
+		<result property="platform" column="platform" />
+		<result property="account" column="account" />
+		<result property="reason" column="reason" />
+		<result property="backup" column="backup" />
+		<result property="bak1" column="bak1" />
+	</resultMap>
+	<resultMap id="pageResultMap"  type="java.util.HashMap"/>
+
+	<!-- 新增退款申请 xiaojin_wu -->
+	<insert id="insertRefundApply" parameterType="com.bluemobi.po.RefundApply">
+
+		INSERT INTO
+		e_refund_apply(orderid,
+		money,state,applytime,platform,account,reason,backup,bak1)
+		VALUES(#{orderid},
+		#{money},
+		#{state},
+		#{applytime},
+		#{platform},
+		#{account},
+		#{reason},
+		#{backup},
+		#{bak1}
+		)
+	</insert>
+
+	<!-- 获取待审核列表 xiaojin_wu -->
+	<select id="getRefundApplyList" parameterType="map" resultMap="pageResultMap">
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		applyid,
+		orderid,
+		(
+		SELECT
+		a.totalfare
+		FROM
+		e_order a
+		WHERE
+		a.orderid = t.orderid
+		) totalfare,
+		money,
+		state,
+		applytime,
+		platform,
+		account,
+		reason,
+		BACKUP
+		FROM
+		e_refund_apply t
+		ORDER BY t.applytime DESC
+		) apply
+
+		limit
+		#{offset},#{rows}
+	</select>
+
+
+	<select id="getRefundApplyListCount" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		(
+		SELECT
+		applyid,
+		orderid,
+		(
+		SELECT
+		a.totalfare
+		FROM
+		e_order a
+		WHERE
+		a.orderid = t.orderid
+		) totalfare,
+		money,
+		state,
+		applytime,
+		platform,
+		account,
+		reason,
+		BACKUP
+		FROM
+		e_refund_apply t
+		) apply
+	</select>
+
+	<!--译员审核修改user表数据 xiaojin_wu -->
+	<update id="updateState" parameterType="map">
+		UPDATE e_refund_apply SET state=#{state} WHERE applyid=#{applyid}
+	</update>
+</mapper> 

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.LanguageDao">
+
+	<resultMap id="tSysLanguageResultMap" type="com.bluemobi.po.Language">
+		<id property="languageid" column="languageid" />
+		<result property="languagename" column="languagename" />
+		<result property="userid" column="userid" />
+		<result property="createtime" column="createtime" />
+	</resultMap>
+	<resultMap id="pageResultMap" type="java.util.HashMap"
+		extends="tSysLanguageResultMap"></resultMap>
+	<resultMap id="findResultMap" type="java.util.HashMap"
+		extends="tSysLanguageResultMap"></resultMap>
+
+	<!-- App语种列表 -->
+	<select id="getLanguage" parameterType="map" resultMap="findResultMap">
+		SELECT
+		LANGUAGEID,
+		LANGUAGENAME
+		FROM e_sys_language
+		WHERE
+		LANGUAGEENG=#{languageEng}
+		<if test="hotLanguageId != null and hotLanguageId != '' ">
+			AND HOTLANGUAGEID=#{hotLanguageId}
+		</if>
+	</select>
+
+	<!-- 后台获取语言列表 xiaojin_wu -->
+	<select id="getList" parameterType="map" resultType="map">
+
+		SELECT
+		a.languageid,
+		a.languagename,
+		a.languageEng,
+		a.hotLanguageId
+		FROM
+		e_sys_language a
+		<if test="state != null and state != '' ">
+			WHERE t.state =#{state}
+		</if>
+		limit #{offset},#{rows}
+	</select>
+
+	<select id="getlanguageListCounts" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		e_sys_language a
+	</select>
+
+	<!-- 新增语种 xiaojin_wu -->
+	<insert id="insertLanguage" parameterType="map">
+		INSERT INTO
+		e_sys_language(languagename,languageEng,hotLanguageId)
+		VALUES(
+		#{languagename},
+		#{languageEng},
+		#{hotLanguageId})
+	</insert>
+
+	<update id="updateLanguage" parameterType="map">
+		update e_sys_language
+		<set>
+			<if test="trainid != null">
+				languagename=#{languagename},
+			</if>
+			<if test="trainname != null">
+				languageEng=#{languageEng},
+			</if>
+			<if test="ctime != null">
+				hotLanguageId=#{hotLanguageId},
+			</if>
+		</set>
+		<where>
+			languageid=#{languageid}
+		</where>
+	</update>
+
+
+	<delete id="deleteLanguage" parameterType="map">
+		delete from
+		t_train
+		where
+		trainid=#{trainid}
+	</delete>
+
+	<!-- 后台获取语言列表 xiaojin_wu -->
+	<select id="getSelectList" resultType="map">
+		SELECT languageid,languagename,languageEng FROM e_sys_language
+	</select>
+</mapper> 

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.WithdrawCashApplyDao">
+
+	<resultMap id="tWithdrawCashApplyResultMap" type="com.bluemobi.po.WithdrawCashApply">
+		<id property="withdrawid" column="withdrawid" />
+		<result property="userid" column="userid" />
+		<result property="money" column="money" />
+		<result property="platform" column="platform" />
+		<result property="account" column="account" />
+		<result property="applytime" column="applytime" />
+		<result property="state" column="state" />
+		<result property="backup" column="backup" />
+		<result property="bak1" column="bak1" />
+	</resultMap>
+	<resultMap id="pageResultMap" type="java.util.HashMap" />
+
+	<!-- 新增退款申请 xiaojin_wu -->
+	<insert id="insertWithdrawCashApply" parameterType="com.bluemobi.po.WithdrawCashApply">
+		INSERT INTO
+		e_withdrawcash_apply(userid,
+		money,platform,account,applytime,state,backup,bak1)
+		VALUES(
+		#{userid},
+		#{money},
+		#{platform},
+		#{account},
+		#{applytime},
+		#{state},
+		#{backup},
+		#{bak1}
+		)
+
+	</insert>
+
+	<!-- 获取待审核列表 xiaojin_wu -->
+	<select id="getWithDrawApplyList" parameterType="map" resultMap="pageResultMap">
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		withdrawid,
+		userid,
+		(
+		SELECT
+		a. NAME
+		FROM
+		e_user a
+		WHERE
+		t.userid = a.userid
+		) username,
+		(
+		SELECT
+		a.usertype
+		FROM
+		e_user a
+		WHERE
+		t.userid = a.userid
+		) usertype,
+		money,
+		platform,
+		account,
+		state,
+		applytime,
+		BACKUP
+		FROM
+		e_withdrawcash_apply t
+		) apply
+
+		limit
+		#{offset},#{rows}
+	</select>
+
+	<!-- 获取待审核列表数量 xiaojin_wu -->
+	<select id="getWithDrawApplyCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		(
+		SELECT
+		applyid,
+		orderid,
+		(
+		SELECT
+		a.totalfare
+		FROM
+		e_order a
+		WHERE
+		a.orderid = t.orderid
+		) totalfare,
+		money,
+		state,
+		applytime,
+		platform,
+		account,
+		reason,
+		BACKUP
+		FROM
+		e_refund_apply t
+		ORDER BY t.applytime DESC
+		)
+		apply
+
+	</select>
+</mapper> 

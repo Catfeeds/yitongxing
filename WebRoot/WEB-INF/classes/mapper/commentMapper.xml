@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.CommentDao">
+	<resultMap type="com.bluemobi.po.Comment" id="tCommentResultMap">
+           <result column="commentid" property="commentid"/>
+           <result column="userid" property="userid"/>   
+           <result column="content" property="content"/>
+           <result column="createtime" property="createtime"/>
+           <result column="account" property="account"/>
+           <result column="name" property="name"/>
+    </resultMap>
+	
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="tCommentResultMap" />
+	<resultMap id="findResultMap"  type="java.util.HashMap" extends="tCommentResultMap" />
+	
+	<insert id="insert" parameterType="com.bluemobi.po.Comment">
+		insert into t_comment(userid,content,createtime)values(#{userid},#{content},#{createtime})
+	</insert>
+	
+	<select id="getCommentList" resultMap="findResultMap" parameterType="map">
+       select t1.commentid,t1.userid,t1.content,t1.createtime,t2.name,t2.account,t2.headurl
+        from  t_comment t1 left join e_user t2 on t1.userid=t2.userid
+        where t1.userid=#{userId} 
+        order by createtime desc 
+        limit #{offset},#{rows}
+    </select>
+    
+	
+	<delete id="deleteComment" parameterType="java.lang.String">
+		delete from t_comment where commentid=#{commentId}
+	</delete>
+	
+	<select id="getCommentListCount" parameterType="map" resultType="int">
+	   select count(1) from t_comment
+	</select>
+	
+	
+</mapper> 

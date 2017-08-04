@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.TransPayDao">
+
+	<resultMap id="tTranspayResultMap" type="com.bluemobi.po.TransPay">
+		<id property="transpayid" column="transpayid" />
+		<result property="userid" column="userid" />
+		<result property="amount" column="amount" />
+		<result property="state" column="state" />
+		<result property="transactionid" column="transactionid" />
+		<result property="paytype" column="paytype" />
+		<result property="createtime" column="createtime" />
+	</resultMap>
+
+	<insert id="insert" parameterType="com.bluemobi.po.TransPay">
+	   insert into t_transpay (
+	   	 transpayid,
+	     userid,
+	     amount,
+	     <if test="transactionid != null">
+	     	transactionid,
+	     </if>
+	     paytype,
+	     createtime
+	   )values (
+	   	 #{transpayid},
+	     #{userid},
+	     #{amount},
+	     <if test="transactionid != null">
+	     	#{transactionid},
+	     </if>
+	     #{paytype},
+	     #{createtime}
+	   )
+	</insert>
+
+	<update id="updateState" parameterType="com.bluemobi.po.TransPay">
+	   update t_transpay set
+	     state=1
+	   where 
+	    transpayid=#{transpayid} 
+	</update>
+
+	<select id="get" parameterType="map" resultType="com.bluemobi.po.TransPay">
+	   select 
+	    transpayid,
+	    userid,
+	    amount,
+	    state,
+	    transactionid,
+	    paytype,
+	    createtime
+	   from t_transpay
+	   where 
+	    transpayid=#{transpayid} 
+	</select>
+
+</mapper> 

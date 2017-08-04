@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+【InnoDB free: 12288 kB】对象关系映射 配置 
+ @author LiuChuang Chuang.Liuc@Bluemobi.cn
+ @date 2016-08-16 13:58:31
+ -->
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.TrainDao">
+
+	<resultMap id="trainResultMap" type="com.bluemobi.po.Train">
+		<id property="trainid" column="trainid" />
+       <result property="trainname" column="trainname" />
+       <result property="ctime" column="ctime" />
+	</resultMap>
+	<resultMap id="mapResultMap"  type="java.util.HashMap" extends="trainResultMap"></resultMap>
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="trainResultMap"></resultMap>
+	
+	<insert id="insert" parameterType="com.bluemobi.po.Train" useGeneratedKeys="true" keyProperty="trainid" >
+	   insert into t_train (
+	     trainid,
+	     trainname,
+	     ctime
+	   )values (
+	     #{trainid},
+	     #{trainname},
+	     #{ctime}
+	   )
+	</insert>
+	<update id="update" parameterType="com.bluemobi.po.Train">
+		update t_train
+		<set>
+			<if test="trainid != null">
+				trainid=#{trainid},
+			</if>
+			<if test="trainname != null">
+				trainname=#{trainname},
+			</if>
+			<if test="ctime != null">
+				ctime=#{ctime},
+			</if>
+		</set>
+		<where>
+			trainid=#{trainid} 
+		</where>
+	</update>
+	<delete id="delete" parameterType="map">
+	   delete from 
+	     t_train 
+	   where 
+	    trainid=#{trainid} 
+	</delete>
+	<!-- 分页查询培训列表 liuchuang add -->
+	<select id="trainpage" parameterType="map" resultType="map">
+	   select * from t_train
+	   <include refid="trainCondition" />
+	   limit #{offset},#{rows}
+	</select>
+	<!-- 分页查询培训数量 liuchuang add -->
+	<select id="trainpageCount" parameterType="map" resultType="int">
+	   select count(1) from t_train
+	   <include refid="trainCondition" />
+	</select>
+	<sql id="trainCondition">
+	   <where>
+	     <if test="trainname != null and trainname != '' ">
+	        trainname like '%${trainname}%'
+	     </if>
+	    </where>
+	</sql>
+	<!-- 添加培训答案 liuchuang add -->
+	<insert id="insertAnswer" parameterType="map">
+	   insert into t_train_answer (
+	     trainid,
+	     optionname,
+	     ctime,
+	     isanswer
+	   )values (
+	     #{trainid},
+	     #{optionname},
+	     #{ctime},
+	     #{isanswer}
+	   )
+	</insert>
+	<!-- 查询培训信息 liuchuang add -->
+	<select id="findTrain" parameterType="map" resultType="map">
+	  select tr.*, (select answerid from t_train_answer tta where tta.trainid=tr.trainid and tta.isanswer=1) answerid from t_train tr where tr.trainid=#{trainid}
+	</select>
+	<!-- 查询培训答案 liuchuang add -->
+	<select id="findTrainAnswer" parameterType="map" resultType="map">
+	   select answerid,trainid,optionname,isanswer from t_train_answer where trainid=#{trainid}
+	</select>
+	<!-- 删除培训答案 liuchuang add -->
+	<delete id="deleteTrainAnswer" parameterType="map">
+	   delete from 
+	     t_train_answer 
+	   where 
+	    trainid=#{trainid} 
+	</delete>
+	<!-- 分页查询培训资料列表 liuchuang add -->
+	<select id="datapage" parameterType="map" resultType="map">
+	   select * from t_train_data
+	   <include refid="dataCondition" />
+	   order by ctime desc
+	   limit #{offset},#{rows}
+	</select>
+	<!-- 分页查询培训资料数量 liuchuang add -->
+	<select id="datapageCount" parameterType="map" resultType="int">
+	   select count(1) from t_train_data
+	   <include refid="dataCondition" />
+	</select>
+	<sql id="dataCondition">
+	   <where>
+	     <if test="dataname != null and dataname != '' ">
+	        dataname like '%${dataname}%'
+	     </if>
+	    </where>
+	</sql>
+	<!-- 添加培训资料 liuchuang add -->
+	<insert id="insertData" parameterType="map">
+	   insert into t_train_data (
+	     dataname,
+	     ctime,
+	     context
+	   )values (
+	     #{dataname},
+	     #{ctime},
+	     #{context}
+	   )
+	</insert>
+	<!-- 查询培训资料 liuchuang add -->
+	<select id="findData" parameterType="map" resultType="map">
+	   select * from t_train_data where traindataid=#{traindataid}
+	</select>
+	<!-- 修改培训资料 liuchuang add -->
+	<update id="updateData" parameterType="map">
+		update t_train_data
+		<set>
+			<if test="dataname != null">
+				dataname=#{dataname},
+			</if>
+			<if test="context != null">
+				context=#{context},
+			</if>
+		</set>
+		<where>
+			traindataid=#{traindataid} 
+		</where>
+	</update>
+	<!-- 删除培训资料 liuchuang add -->
+	<delete id="deleteData" parameterType="map">
+	   delete from 
+	     t_train_data
+	   where 
+	    traindataid=#{traindataid} 
+	</delete>
+	<!-- 查询通过数量 liuchuang add -->
+	<select id="findTrainCount" parameterType="map" resultType="map">
+	   select * from t_train_count where traincountid=#{traincountid}
+	</select>
+	<!-- 修改通过数量 liuchuang add -->
+	<update id="updateCount" parameterType="map">
+		update t_train_count
+		<set>
+			traincount=#{traincount}
+		</set>
+		<where>
+			traincountid=#{traincountid} 
+		</where>
+	</update>
+	<!-- 查询培训资料列表(app) liuchuang add -->
+	<select id="findDataApp" parameterType="map" resultType="map">
+	   select ttd.traindataid,ttd.dataname,ttd.context from t_train_data ttd
+	</select>
+	<!-- 查询培训资料详情(app) liuchuang add -->
+	<select id="findDataMessApp" parameterType="map" resultType="map">
+	   select * from t_train_data where traindataid=#{traindataid}
+	</select>
+	<!-- 查询培训测试列表(app) liuchuang add -->
+	<select id="findTrainApp" parameterType="map" resultType="map">
+	   select trainid,trainname from t_train
+	</select>
+</mapper> 

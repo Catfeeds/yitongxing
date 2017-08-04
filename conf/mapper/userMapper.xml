@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.UserDao">
+	<resultMap id="tUserResultMap" type="com.bluemobi.po.User">
+		<id property="userid" column="userid" />
+		<result property="account" column="account" />
+		<result property="usertype" column="usertype" />
+		<result property="name" column="name" />
+		<result property="sex" column="sex" />
+		<result property="age" column="age" />
+		<result property="education" column="education" />
+		<result property="school" column="school" />
+		<result property="idcardno" column="idcardno" />
+		<result property="profession" column="profession" />
+		<result property="needlanguageid" column="needlanguageid" />
+		<result property="countryid" column="countryid" />
+		<result property="provinceid" column="provinceid" />
+		<result property="cityid" column="cityid" />
+		<result property="passporturl" column="passporturl" />
+		<result property="passporturlmin" column="passporturlmin" />
+		<result property="visaurl" column="visaurl" />
+		<result property="visaurlmin" column="visaurlmin" />
+		<result property="identificationPhoto" column="identificationPhoto" />
+		<result property="lifePhoto" column="lifePhoto" />
+		<result property="state" column="state" />
+		<result property="token" column="token" />
+		<result property="auditstate" column="auditstate" />
+		<result property="createtime" column="createtime" />
+		<result property="x" column="x" />
+		<result property="y" column="y" />
+		<result property="level" column="level" />
+		<result property="balance" column="balance" />
+		<result property="birthday" column="birthday" />
+		<result property="pushcode" column="pushcode" />
+		<result property="system" column="system" />
+		<result property="isadmin" column="isadmin" />
+		<result property="headurl" column="headurl" />
+		<result property="remark" column="remark" />
+		<result property="ip" column="ip" />
+		<result property="lasttime" column="lasttime" />
+		<result property="specialtyname" column="specialtyname" />
+		<result property="languagename" column="languagename" />
+		<result property="areaname" column="areaname" />
+		<result property="isvip" column="isvip" />
+		<result property="transtate" column="transtate" />
+		<result property="isexit" column="isexit" />
+		<result property="exitbalance" column="exitbalance" />
+		<result property="sextext" column="sextext" />
+		<result property="educationtext" column="educationtext" />
+		<result property="countryname" column="countryname" />
+		<result property="provincename" column="provincename" />
+		<result property="cityname" column="cityname" />
+		<result property="exittime" column="exittime" />
+		<result property="exitpaytype" column="exitpaytype" />
+		<result property="exitpayaccount" column="exitpayaccount" />
+		<result property="invitation" column="invitation" />
+		<result property="firstsign" column="firstsign" />
+		<result property="istrain" column="istrain" />
+		<result property="position" column="position" />
+		<result property="company" column="company" />
+		<result property="signature" column="signature" />
+		<result property="phone" column="phone" />
+		<result property="isfrozen" column="isfrozen" />
+		<result property="isorder" column="isorder" />
+		<result property="majorid" column="majorid" />
+	</resultMap>
+	
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="tUserResultMap" />
+	<resultMap id="findResultMap"  type="java.util.HashMap" extends="tUserResultMap" />
+	
+	<!-- APP获取用户信息-->
+	<select id="getUser" parameterType="map" resultType="com.bluemobi.po.User">
+		select 
+		userid,
+		account,
+		usertype,
+		name,
+		sex,
+		age,
+		case sex when 1 then '男' when 2 then '女' else '未知' end sextext,
+		headurl,
+		majorid,
+		profession,
+		school,
+		idcardno,
+		needlanguageid,
+		(select languagename from t_sys_language l where l.languageid=t.needlanguageid) languagename,
+		countryid,
+		(select a.areaname from t_sys_area a where a.areaid=t.countryid) countryname,
+		(select a.areaname from t_sys_area a where a.areaid=t.provinceid) provincename,
+		(select a.areaname from t_sys_area a where a.areaid=t.cityid) cityname,
+		provinceid,
+		cityid,
+		concat((select a.areaname from t_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from t_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from t_sys_area a where a.areaid=t.cityid)) areaname,
+		passporturl,
+		passporturlmin,
+		visaurl,
+		visaurlmin,
+		identificationPhoto,
+		lifePhoto,
+		state,
+		auditstate,
+		createtime,
+		x,
+		y,
+		level,
+		case level when 1 then '商务翻译' when 2 then '旅游向导'  else '未知' end leveltext,
+  		balance,
+		birthday,
+		pushcode,
+		system,
+		remark,
+		transtate,
+		isexit,
+		exitbalance,
+		position,
+		signature,
+		phone,
+		istrain,
+		firstsign,
+		guaranty
+		from e_user t where userid=#{userid} and usertype!=1
+	</select>
+	
+	<!-- 通过用户名获取用户信息 -->
+	<select id="getUserByUserName" parameterType="map" resultMap="tUserResultMap">
+		select 
+		userid,
+		account,
+		usertype,
+		name,
+		sex,    
+		age,
+		education,
+		school,
+		idcardno,
+		needlanguageid,
+		(select languagename from e_sys_language l where l.languageid=t.needlanguageid) languagename,
+		countryid,
+		provinceid,
+		cityid,
+		concat((select a.areaname from e_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from e_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from e_sys_area a where a.areaid=t.cityid)) areaname,
+		passporturl,
+		passporturlmin,
+		visaurl,
+		visaurlmin,
+		identificationPhoto,
+		lifePhoto,
+		state,
+		auditstate,
+		createtime,
+		x,
+		y,
+		level,
+		balance,
+		birthday,
+		pushcode,
+		system,
+		isadmin,
+		remark,
+		headurl,
+		transtate,
+		isexit,
+		exitbalance
+		from e_user t where account=#{account}
+		<if test="type != null and type != ''">
+			and usertype=#{usertype}
+		</if>
+	</select>
+	<!-- 查询用户信息  -->
+	<select id="getUserList" parameterType="map" resultMap="pageResultMap">
+	select * from (
+	   select
+	    userid,
+		account,
+		pwd,
+		usertype,
+		name,
+		sex,
+		age,
+		headurl,
+		education,
+		school,
+		idcardno,
+		specialtyid,
+		(select specialtyname from t_sys_specialty s where s.specialtyid=t.specialtyid) specialtyname,
+		languageid,
+		(select languagename from t_sys_language l where l.languageid=t.languageid) languagename,
+		countryid,
+		provinceid,
+		cityid,
+		concat((select a.areaname from t_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from t_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from t_sys_area a where a.areaid=t.cityid)) areaname,
+		passporturl,
+		passporturlmin,
+		visaurl,
+		visaurlmin,
+		studentupurl,
+		studentupurlmin,
+		studentdownurl,
+		studentdownurlmin,
+		state,
+		token,
+		auditstate,
+		createtime,
+		x,
+		y,
+		level,
+		(select price from t_price p where p.type=t.level and t.countryid=p.countryid) price,
+		balance,
+		date_format(birthday,'%Y-%m-%d') birthdayFormat,
+		remark,
+		isexit,
+		exitbalance,
+		ifnull(invitation,'') invitation,
+		(case when t.countryid is null then '非会员' else (case when (select price from t_price p where p.type=6 and p.countryid=t.countryid) > t.balance then '非会员' else '会员' end) end) isvip,
+		exittime,exitpaytype,exitpayaccount,isfrozen,isorder from t_user t ) na
+		<where>
+			na.usertype=#{usertype}
+		<if test="school != null and school != ''">
+				and na.school like '%${school}%'
+			</if>
+			<if test="name != null and name != ''">
+				and na.name like '%${name}%'
+			</if>
+			<if test="areaname != null and areaname != ''">
+				and na.areaname like '%${areaname}%'
+			</if>
+			<if test="state != null and state != ''">
+				and na.state=#{state}
+			</if>
+			<if test="education != null and education != ''">
+				and na.education=#{education}
+			</if>
+			<if test="specialtyid != null and specialtyid != ''">
+				and na.specialtyid=#{specialtyid}
+			</if>
+			<if test="school != null and school != ''">
+				and na.school like '%${school}%'
+			</if>
+			<if test="account != null and account != ''">
+				and na.account like '%${account}%'
+			</if>
+			<if test="languageid != null and languageid != ''">
+				and na.languageid=#{languageid}
+			</if>
+			<if test="level != null and level != ''">
+				and na.level=#{level}
+			</if>
+			<if test="sex != null and sex != ''">
+				and na.sex=#{sex}
+			</if>
+			<if test="isfrozennew != null and isfrozennew != ''">
+				and na.isfrozen=#{isfrozennew}
+			</if>
+		</where>	
+	   order by exittime desc
+	   <if test="rows != 0">
+		   limit #{offset},#{rows}
+	   </if>
+	</select>
+	<select id="getUserListCount" parameterType="map" resultType="int">
+	   select count(1) <include refid="pageCondition" />
+	</select>
+	<sql id="pageCondition">
+		from (select
+	    userid,
+		account,
+		pwd,
+		usertype,
+		name,
+		sex,
+		age,
+		headurl,
+		education,
+		school,
+		idcardno,
+		specialtyid,
+		(select specialtyname from t_sys_specialty s where s.specialtyid=t.specialtyid) specialtyname,
+		languageid,
+		(select languagename from t_sys_language l where l.languageid=t.languageid) languagename,
+		countryid,
+		provinceid,
+		cityid,
+		concat((select a.areaname from t_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from t_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from t_sys_area a where a.areaid=t.cityid)) areaname,
+		passporturl,
+		passporturlmin,
+		visaurl,
+		visaurlmin,
+		studentupurl,
+		studentupurlmin,
+		studentdownurl,
+		studentdownurlmin,
+		state,
+		token,
+		auditstate,
+		createtime,
+		x,
+		y,
+		level,
+		(select price from t_price p where p.type=t.level and t.countryid=p.countryid) price,
+		balance,
+		birthday,
+		remark,
+		isexit,
+		exitbalance,
+		ifnull(invitation,'') invitation,
+		(case when t.countryid is null then '非会员' else (case when (select price from t_price p where p.type=6 and p.countryid=t.countryid) > t.balance then '非会员' else '会员' end) end) isvip,
+		exittime,exitpaytype,exitpayaccount,isfrozen,isorder from t_user t ) nb
+		<where>
+			nb.usertype=#{usertype}
+			<if test="account != null and account != ''">
+				and nb.account like '%${account}%'
+			</if>
+			<if test="name != null and name != ''">
+				and nb.name like '%${name}%'
+			</if>
+			<if test="areaname != null and areaname != ''">
+				and nb.areaname like '%${areaname}%'
+			</if>
+			<if test="state != null and state != ''">
+				and nb.state=#{state}
+			</if>
+			<if test="education != null and education != ''">
+				and nb.education=#{education}
+			</if>
+			<if test="specialtyid != null and specialtyid != ''">
+				and nb.specialtyid=#{specialtyid}
+			</if>
+			<if test="school != null and school != ''">
+				and nb.school like '%${school}%'
+			</if>
+			<if test="languageid != null and languageid != ''">
+				and nb.languageid=#{languageid}
+			</if>
+			<if test="level != null and level != ''">
+				and nb.level=#{level}
+			</if>
+			<if test="sex != null and sex != ''">
+				and nb.sex=#{sex}
+			</if>
+			<if test="isfrozennew != null and isfrozennew != ''">
+				and nb.isfrozen=#{isfrozennew}
+			</if>
+		</where>
+	</sql>
+	<!-- 屏蔽  add by yubin -->
+	<select id="updateState">
+		update t_user set state=#{state} where userid=#{userid}
+	</select>
+	
+	<select id="checkTrain" parameterType="map" resultType="int">
+	   SELECT t.istrain from e_user t WHERE t.userid=#{userId}
+	</select>
+	
+	<!--得到用户的pushCode -->
+	<select id="updatePushCode">
+		update e_user set pushcode=#{pushCode} where userid=#{userId}
+	</select>
+	<!--通过userId得到pushCode -->
+	<select id="getPushCodeById" parameterType="map" resultType="map">
+		SELECT t.pushcode FROM e_user t WHERE userid=#{userId}
+	</select>
+	<!-- 通过userid获取用户信息  add by yubin -->
+	<select id="getUserById" parameterType="map" resultMap="tUserResultMap">
+		select 
+		userid,
+		account,
+		pwd,
+		usertype,
+		name,
+		sex,
+		age,
+		headurl,
+		education,
+		school,
+		idcardno,
+		specialtyid,
+		(select specialtyname from t_sys_specialty s where s.specialtyid=t.specialtyid) specialtyname,
+		languageid,
+		(select languagename from t_sys_language l where l.languageid=t.languageid) languagename,
+		countryid,
+		provinceid,
+		cityid,
+		concat((select a.areaname from t_sys_area a where a.areaid=t.countryid),
+		(select a.areaname from t_sys_area a where a.areaid=t.provinceid),
+		(select a.areaname from t_sys_area a where a.areaid=t.cityid)) areaname,
+		passporturl,
+		passporturlmin,
+		visaurl,
+		visaurlmin,
+		studentupurl,
+		studentupurlmin,
+		studentdownurl,
+		studentdownurlmin,
+		state,
+		token,
+		auditstate,
+		createtime,
+		x,
+		y,
+		level,
+		balance,
+		birthday,
+		pushcode,
+		system,
+		remark,
+		isexit,
+		exitbalance,
+		(select case when (select price from t_price where type=6 and countryid=t.countryid) > t.balance then '0' else '1' end) isvip
+		from t_user t where userid=#{userid}
+	</select>
+	<!-- 审核通过修改t_user中的用户信息 add by yubin -->
+	<update id="updateAuditUserToUserTable" parameterType="com.bluemobi.po.UserAudit">
+		update t_user set
+			name=#{name},
+			sex=#{sex},
+			age=#{age},
+			education=#{education},
+			school=#{school},
+			idcardno=#{idcardno},
+			specialtyid=#{specialtyid},
+			languageid=#{languageid},
+			countryid=#{countryid},
+			provinceid=#{provinceid},
+			cityid=#{cityid},
+			birthday=#{birthday},
+			passporturl=#{passporturl},
+			passporturlmin=#{passporturlmin},
+			visaurl=#{visaurl},
+			visaurlmin=#{visaurlmin},
+			studentupurl=#{studentupurl},
+			studentupurlmin=#{studentupurlmin},
+			studentdownurl=#{studentdownurl},
+			studentdownurlmin=#{studentdownurlmin},
+			level=#{level},
+			remark=#{remark},
+			origin=#{origin},
+			phone=#{phone}
+			<if test="balance != null and balance != '' ">
+				,balance=#{balance},isorder=#{isorder},isfrozen=#{isfrozen}
+			</if>
+		where userid=#{userid}
+	</update>
+	<!-- 查询个人信息 -->
+	<select id="findPrice" parameterType="map" resultType="map">
+	   select u.*,p.price,p.name pname,p.unit from t_user u LEFT JOIN t_price p on u.level=p.type and u.countryid=p.countryid where userid=#{userid}
+	</select>
+	<!-- 查询价钱 -->
+	<select id="findPriceHt" parameterType="map" resultType="map">
+	   select * from t_price where type=#{type}
+	   <if test="countryid != null and countryid != '' ">
+	   	and countryid=#{countryid}
+	   </if>
+	</select>
+	<!-- 查询用户信息 -->
+	<select id="findUserTr" parameterType="map" resultType="com.bluemobi.po.User">
+	   select * from t_user where userid=#{userid}
+	</select>
+	<!-- 查询个人信息用于lbs -->
+	<select id="findUserLBS" parameterType="map" resultType="map">
+	    select u.*,ifnull((select round(avg(starlevel),0) from t_order_comment where touserid=u.userid),0) starlevel from t_user u where u.userid=#{userid}
+	</select>
+	<!-- app翻译详情 -->
+	<select id="getTranslationUserShow" parameterType="map" resultType="map">
+		SELECT
+			t.age,
+			t.userid,
+			t.name,
+			(case t.sex when '1' then '男' when '2' then '女' end)sex,
+			(case t.education when '1' then '本科' when '2' then '硕士' when '3' then '博士' end)education,
+			t.school,t.idcardno,
+			(select ts.specialtyname from t_sys_specialty ts where ts.specialtyid=t.specialtyid LIMIT 1)specialtyid,
+ 			(select tl.languagename from t_sys_language tl where tl.languageid=t.languageid LIMIT 1)languageid,
+ 			(select ta.areaname from t_sys_area ta where ta.areaid=t.cityid )cityid,
+ 			(case t.level when '1' then '口译员' when '2' then '口译员' when '3' then '高级口译员' end)level,
+ 			(year(curdate())-year(birthday)+(DATE_FORMAT(birthday,'%m%d')<![CDATA[<=]]>(DATE_FORMAT(curdate(),'%m%d')))) birthday,
+ 			t.headurl,
+ 			t.remark,
+			(select tp.price from t_price tp where tp.type = t.level and tp.countryid=t.countryid) price
+			FROM t_user t
+		WHERE t.usertype=2 and t.state='0' and  t.userid=#{userid}
+	</select>
+	
+	<!-- 新增用户 -->
+	<insert id="insertUser" parameterType="com.bluemobi.po.User"
+		useGeneratedKeys="true" keyProperty="userid">
+		insert into e_user(
+			account,
+			usertype,
+			createtime
+		) values(
+			#{account},
+			#{usertype},
+			#{createtime}
+		)
+	</insert>
+	
+	<!-- 获取用户密码 -->
+	<select id="getUserPwd" parameterType="map" resultMap="tUserResultMap">
+		select 
+		pwd
+		from t_user
+		where userid=#{userid}
+	</select>
+	
+	<!-- 设置新的密码 -->
+	<update id="updateNewPwd" parameterType="map">
+		update t_user set pwd=#{pwd} where userid=#{userid}
+	</update>
+
+	<!-- 修改个人信息 -->
+	<update id="updateUserInfo" parameterType="map">
+		update e_user
+		<set>
+			<if test="balance != null and balance != ''">
+				balance=#{balance},
+			</if>
+			<if test="name != null and name != ''">
+				name=#{name},
+			</if>
+			<if test="position != null and position != ''">
+				position=#{position},
+			</if>
+			<if test="headurl != null and headurl != ''">
+				headurl=#{headurl}
+			</if>
+			<if test="identificationPhoto != null and identificationPhoto != ''">
+				identificationPhoto=#{identificationPhoto}
+			</if>
+			<if test="sex != null and sex != ''">
+				sex=#{sex},
+			</if>
+			<if test="age != null and age != ''">
+				age=#{age},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone=#{phone},
+			</if>
+			<if test="profession != null and profession != ''">
+				profession=#{profession}
+			</if>
+			<if test="school != null and school != ''">
+				school=#{school}
+			</if>
+			<if test="major != null and major != ''">
+				major=#{major},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark=#{remark},
+			</if>
+			<if test="countryid != null and countryid != ''">
+				countryid=#{countryid},
+			</if>
+			<if test="provinceid != null and provinceid != ''">
+				provinceid=#{provinceid}
+			</if>
+			<if test="needlanguageid != null and needlanguageid != ''">
+				needlanguageid=#{needlanguageid}
+			</if>
+			<if test="level != null and level != ''">
+				level=#{level},
+			</if>
+			<if test="auditstate != null and auditstate != ''">
+				auditstate=#{auditstate},
+			</if>
+			<if test="applytime != null and applytime != ''">
+				applytime=#{applytime},
+			</if>
+		</set>
+		<where>
+			userid=#{userId}
+		</where>
+	</update>
+
+	<!-- 后台管理员列表 -->
+	<select id="getUserAdminList" parameterType="map" resultMap="pageResultMap">
+	   select
+		userid,
+		account,
+		ip,
+		lasttime,
+		state,
+		isadmin
+		from
+		t_user
+		where usertype=1
+		<if test="account !=null and account != '' ">
+			and account like '%${account}%'
+		</if>
+		<if test="ip !=null and ip != '' ">
+			and ip like '%${ip}%'
+		</if>
+	   order by createtime desc limit #{offset},#{rows}
+	</select>
+	
+	<!-- 管理员总数-->
+	<select id="getUserAdminListCount" parameterType="map" resultType="int">
+	   select count(1) from
+		t_user
+		where usertype=1
+		<if test="account !=null and account != '' ">
+		and account like '%${account}%'
+		</if>
+		<if test="ip !=null and ip != '' ">
+		and ip like '%${ip}%'
+		</if>
+	</select>
+	
+	<!-- 翻译端注册验证 add by yubin -->
+	<update id="verify" parameterType="String">
+		update t_user set transtate=1 where token=#{token}
+	</update>
+	
+	<!-- 用户申请退出 add by yubin -->
+	<update id="applyExit" parameterType="map">
+		update t_user set
+		<if test="tag == null">
+			isexit=1,exitbalance=balance,balance=0,
+		</if>
+		exittime=#{exittime},exitpaytype=#{exitpaytype},exitpayaccount=#{exitpayaccount} where token=#{token}
+	</update>
+	
+	<!-- 翻译扣款 by liuchuang -->
+	<update id="updateBalance" parameterType="map">
+		update t_user set balance=(balance-#{price})
+		<if test="istimely != null and istimely != '' ">
+			,cancelsum=cancelsum+1
+		</if>
+		 where userid=#{userid}
+	</update>
+	
+	<!-- 通过帐号查询用户 -->
+	<select id="getUserListByAcc" parameterType="map" resultMap="tUserResultMap">
+		select * from t_user where account=#{acc}
+	</select>
+	
+	<!-- 确认退出 add by yubin -->
+	<update id="confirmExit" parameterType="int">
+		update t_user set exitbalance=balance, balance=0, isexit=2 where userid=#{userid}
+	</update>
+	
+	<!-- 登录操作 add by yubin -->
+	<update id="login" parameterType="map">
+		update t_user set
+		system=#{system},
+		<if test="isexit == 2">
+			isexit=0,
+		</if>
+		<if test="tag != null and tag != ''">
+			apptoken=#{apptoken},
+		</if>
+		lasttime=#{lasttime}
+		where userid=#{userid}
+	</update>
+	
+	<!-- 管理员登录，修改ip和最后登录时间 -->
+	<update id="updateAdmin" parameterType="com.bluemobi.po.User">
+		update t_user set ip=#{ip},lasttime=#{lasttime} where userid=#{userid}
+	</update>
+	
+	<!-- 翻译充值成功修改帐户余额 add by yubin -->
+	<update id="changeBalance" parameterType="com.bluemobi.po.TransPay">
+		update t_user set balance=balance + #{amount} where userid=#{userid}
+	</update>
+	
+	<!-- 翻译申请或更新资料修改审核状态  -->
+	<update id="updateAuditState" parameterType="com.bluemobi.po.User">
+		UPDATE e_user t SET t.auditstate=#{auditstate} WHERE t.userid=#{userid}
+	</update>
+	
+	<!-- 查询用户信息 -->
+	<select id="findUserMessOther" parameterType="map" resultType="map">
+	   select * from t_user where userid=#{userid}
+	</select>
+	<!-- 查询翻译申请资料 liuchuang add -->
+	<select id="findTranAudit" parameterType="map" resultType="map">
+	   select ua.name,ua.sex,ua.education,ua.age,ua.idcardno,ua.school,remark,
+	   concat(#{imageUrl},passporturlmin) passporturlmin,concat(#{imageUrl},visaurlmin) visaurlmin,concat(#{imageUrl},studentupurlmin) studentupurlmin,concat(#{imageUrl},studentdownurlmin) studentdownurlmin,
+		(select specialtyname from t_sys_specialty where specialtyid=ua.specialtyid) specialtyid,
+		(select languagename from t_sys_language where languageid=ua.languageid) languageid,
+		(select areaname from t_sys_area where areaid=ua.countryid) countryid,
+		(select areaname from t_sys_area where areaid=ua.provinceid) provinceid,
+		(select areaname from t_sys_area where areaid=ua.cityid) cityid
+		 from t_user_audit ua where ua.userid=#{userid}
+	</select>
+	<!-- 刷新翻译取消次数  add by liuchuang -->
+	<update id="updateCancelsum" parameterType="map">
+		update t_user set cancelsum=0 where usertype=2
+	</update>
+	<!-- 修改用户余额  add by liuchuang -->
+	<update id="updateUserBalance" parameterType="map">
+		update t_user set balance=(balance+#{bondmoney}) where userid=#{userid}
+	</update>
+	<!-- 修改用户余额(支付)  add by liuchuang -->
+	<update id="updateBalanceUser" parameterType="map">
+		update t_user set balance=(balance-#{price}) where userid=#{userid}
+	</update>
+	<!-- 查询翻译是否登录过(app) liuchuang add -->
+	<select id="findTranFirstsign" parameterType="map" resultType="map">
+	   select firstsign,istrain from t_user where userid=#{userid}
+	</select>
+	<!-- 修改翻译登录状态、修改翻译测试通过状态(app) liuchuang add -->
+	<update id="updateTranFirstsign" parameterType="map">
+		update t_user set
+		<if test="firstsign != null and firstsign != '' ">
+			firstsign=#{firstsign}
+		</if>
+		<if test="istrain != null and istrain != '' ">
+			istrain=#{istrain}
+		</if>
+		where userid=#{userid}
+	</update>
+	<!-- 查询翻译余额满足条件(app) liuchuang add -->
+	<select id="findPriceSatisfy" parameterType="map" resultType="map">
+	   select price from t_price where countryid=1 and type=#{type}
+	</select>
+	<!-- 查询翻译接单是否冻结(app) liuchuang add -->
+	<select id="checkIsorder" parameterType="map" resultType="int">
+	   select isfrozen from e_user where userid=#{tranId}
+	</select>
+	<!-- 修改翻译接单冻结状态 liuchuang add -->
+	<update id="updateIsorder" parameterType="map">
+		update t_user set isfrozen=#{isfrozen}
+		<if test="isbalance != null and isbalance != '' ">
+			,balance=#{balance}
+		</if>
+		 where userid=#{userid}
+	</update>
+</mapper> 

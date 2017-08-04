@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.PriceDao">
+	<resultMap id="tPrice" type="com.bluemobi.po.Price">
+		<id property="priceid" column="priceid" />
+		<result property="price" column="price" />
+		<result property="name" column="name" />
+		<result property="type" column="type" />
+		<result property="remark" column="remark" />
+		<result property="createtime" column="createtime" />
+	</resultMap>
+	
+	<resultMap id="tPriceMap" type="java.util.HashMap" extends="tPrice"></resultMap>
+	
+	<!-- Ywei 修改原方法 按照国家查询价格信息 -->
+	<select id="getPrice" parameterType="map" resultMap="tPriceMap">
+		select * from t_price where countryid = #{areaid}
+	</select>
+	
+	<update id="updatePrice" parameterType="map">
+		update t_price set price=#{price} where priceid=#{priceid}
+	</update>
+	
+	<!-- 查询各时间段价钱 liuchuang add -->
+	<select id="findPrice" parameterType="map" resultType="map">
+		select type,price,substring_index(name,'-',+1) starttime,substring_index(name,'-',-1) endtime from t_price where countryid=#{countryid} and type in(${type})
+	</select>
+	<!-- 查询计算规则(计算器) liuchuang add -->
+	<select id="findRule" parameterType="map" resultType="map">
+		select price,name from t_price where countryid=#{countryid} and type in(${type})
+	</select>
+	<!-- 查询计算规则 liuchuang add -->
+	<select id="findRuRuleApp" parameterType="map" resultType="map">
+		select p.type,p.price,p.name,p.unit,(select price from t_price where name=p.name and countryid=p.countryid and type not in(${type})) lprice from t_price p where p.type in(${type}) and p.countryid=#{countryid}
+	</select>
+	<!-- 查询国家 liuchuang add -->
+	<select id="findAreList" parameterType="map" resultType="map">
+		select areaid,areaname from t_sys_area where parentid=0
+		<if test="countryid != null and countryid != '' ">
+			and areaid=#{countryid}
+		</if>
+	</select>
+</mapper> 

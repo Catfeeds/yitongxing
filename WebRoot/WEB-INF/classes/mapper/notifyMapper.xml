@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.NotifyDao">
+
+	<!-- 新增回调记录 add by yubin -->
+	<insert id="insert" parameterType="com.bluemobi.po.Notify" useGeneratedKeys="true" keyProperty="notifyid">
+	   insert into t_notify (
+	     orderid,
+	     totalfee,
+	     <if test="state != null">
+		     state,
+	     </if>
+	     des,
+	     type,
+	     transactionid,
+	     paytype,
+	     <if test="buyerid != null">
+	     	buyerid,
+	     </if>
+	     <if test="buyeremail != null">
+	     	buyeremail,
+	     </if>
+	     createtime
+	   )values (
+	     #{orderid},
+	     #{totalfee},
+	     <if test="state != null">
+	     	#{state},
+	     </if>
+	     #{des},
+	     #{type},
+	     #{transactionid},
+	     #{paytype},
+	     <if test="buyerid != null">
+	     	#{buyerid},
+	     </if>
+	     <if test="buyeremail != null">
+	     	#{buyeremail},
+	     </if>
+	     #{createtime}
+	   )
+	</insert>
+	
+	<update id="updateState" parameterType="com.bluemobi.po.Notify">
+		update t_notify set
+			<if test="state != null">
+				state=#{state}, 
+			</if>
+			des=#{des}
+		where
+			notifyid=#{notifyid}
+	</update>
+
+</mapper> 

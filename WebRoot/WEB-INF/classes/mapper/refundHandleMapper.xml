@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.RefundHandleDao">
+
+	<resultMap id="tRefundHandleResultMap" type="com.bluemobi.po.RefundHandle">
+		<id property="refundid" column="refundid" />
+		<result property="applyid" column="applyid" />
+		<result property="money" column="money" />
+		<result property="state" column="state" />
+		<result property="handleby" column="handleby" />
+		<result property="handletime" column="handletime" />
+		<result property="backup" column="backup" />
+		<result property="bak1" column="bak1" />
+	</resultMap>
+
+
+	<!-- 新增退款申请 xiaojin_wu -->
+	<insert id="insertRefundHandle" parameterType="com.bluemobi.po.RefundHandle">
+
+		INSERT INTO
+		e_refund_handle(applyid,
+		money,handleby,state,handletime,backup,bak1)
+		VALUES(
+		#{applyid},
+		#{money},
+		#{handleby},
+		#{state},
+		#{handletime},
+		#{backup},
+		#{bak1}
+		)
+	</insert>
+
+
+</mapper> 

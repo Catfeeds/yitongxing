@@ -1,0 +1,12 @@
+[2017-01-19 10:54:30 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:54:30 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:54:30 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:54:30 main JPushUtils.sendPushmm:65]Got Push result -{"msg_id":599370537,"sendno":1419150701}
+[2017-01-19 10:57:46 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:57:46 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:57:46 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:57:46 main JPushUtils.sendPushmm:65]Got Push result -{"msg_id":1957442427,"sendno":825705349}
+[2017-01-19 10:58:55 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:58:55 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:58:55 main NativeHttpClient.<init>:44]Created instance with _maxRetryTimes = 1
+[2017-01-19 10:58:56 main JPushUtils.sendPushmm:65]Got Push result -{"msg_id":3934867685,"sendno":423219689}

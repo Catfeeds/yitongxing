@@ -1,0 +1,996 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.OrderDao">
+	<resultMap id="tOrderResultMap" type="com.bluemobi.po.Order">
+		<id property="orderid" column="orderid" />
+		<result property="countryid" column="countryid" />
+		<result property="provinceid" column="provinceid" />
+		<result property="cityid" column="cityid" />
+		<result property="begintime" column="begintime" />
+		<result property="endtime" column="endtime" />
+		<result property="hours" column="hours" />
+		<result property="tranuserid" column="tranuserid" />
+		<result property="motherlanguageid" column="motherlanguageid" />
+		<result property="needlanguageid" column="needlanguageid" />
+		<result property="level" column="level" />
+		<result property="professionid" column="professionid" />
+		<result property="remark" column="remark" />
+		<result property="userid" column="userid" />
+		<result property="bondmoney" column="bondmoney" />
+		<result property="userfine" column="userfine" />
+		<result property="fanyimoney" column="fanyimoney" />
+		<result property="fanyifine" column="fanyifine" />
+		<result property="state" column="state" />
+		<result property="createtime" column="createtime" />
+		<result property="cancel" column="cancel" />
+		<result property="confirm" column="confirm" />
+		<result property="reset" column="reset" />
+		<result property="canceltime" column="canceltime" />
+		<result property="userconfirm" column="userconfirm" />
+		<result property="tranconfirm" column="tranconfirm" />
+		<result property="getbilltime" column="getbilltime" />
+		<result property="paytime" column="paytime" />
+		<result property="userdel" column="userdel" />
+		<result property="trandel" column="trandel" />
+		<result property="confirmtime" column="confirmtime" />
+		<result property="usersay" column="usersay" />
+		<result property="transay" column="transay" />
+		<result property="oneday" column="oneday" />
+		<result property="istimely" column="istimely" />
+	</resultMap>
+	<resultMap id="pageResultMap" type="java.util.HashMap"
+		extends="tOrderResultMap"></resultMap>
+	<resultMap id="findResultMap" type="java.util.HashMap"
+		extends="tOrderResultMap"></resultMap>
+	<delete id="delete" parameterType="map">
+		delete from
+		t_order
+		where
+		orderid=#{orderid}
+	</delete>
+	<!-- 分页查询订单 -->
+	<select id="orderPage" parameterType="map" resultType="map">
+		select m.* from (select o.*,l.languagename,ifnull(s.specialtyname,'')
+		specialtyname,ifnull(concat('',o.paytype),'')
+		opaytype,ifnull(dealorderid,'') odealorderid,
+		(o.hours*(select p.price
+		from t_price p where p.type=o.level and
+		p.countryid=o.countryid))
+		money,
+		(select p.price from t_price p where p.type=o.level and
+		p.countryid=o.countryid) price,
+		(select u.name from t_user u where
+		u.userid=o.userid) username,
+		ifnull((select areaname from t_sys_area
+		where areaid=o.countryid),'')
+		countryn,
+		ifnull((select areaname from
+		t_sys_area where areaid=o.provinceid),'') provincen,
+		ifnull((select
+		areaname from t_sys_area where areaid=o.cityid),'')
+		cityn,
+		ifnull((select invitation from t_user where userid=o.userid),'')
+		invitation
+		<include refid="orderCondition" />
+		order by m.createtime desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 分页查询订单条数 -->
+	<select id="orderPageCount" parameterType="map" resultType="int">
+		select count(1) from (select o.*,(select u.name from t_user u where
+		u.userid=o.userid) username
+		<include refid="orderCondition" />
+	</select>
+	<!-- 查询订单(无分页) -->
+	<select id="findDownOrder" parameterType="map" resultType="map">
+		select m.* from (select
+		o.*,l.languagename,s.specialtyname,ifnull(concat('',o.paytype),'')
+		opaytype,ifnull(dealorderid,'') odealorderid,
+		(o.hours*(select p.price
+		from t_price p where p.type=o.level and
+		p.countryid=o.countryid))
+		money,
+		(select p.price from t_price p where p.type=o.level and
+		p.countryid=o.countryid) price,
+		(select u.name from t_user u where
+		u.userid=o.userid) username,
+		(select areaname from t_sys_area where
+		areaid=o.countryid) countryn,
+		(select areaname from t_sys_area where
+		areaid=o.provinceid) provincen,
+		(select areaname from t_sys_area where
+		areaid=o.cityid) cityn,
+		(select invitation from t_user where
+		userid=o.userid) invitation
+		<include refid="orderCondition" />
+		order by m.createtime desc
+	</select>
+	<sql id="orderCondition">
+		from t_order o LEFT JOIN t_sys_language l on o.languageid=l.languageid
+		LEFT JOIN t_sys_specialty s on o.specialtyid=s.specialtyid) m
+		<where>
+			<if test="orderid != null and orderid != '' ">
+				m.orderid=#{orderid}
+			</if>
+			<if test="countryid != null and countryid != '' ">
+				and m.countryid=#{countryid}
+			</if>
+			<if test="provinceid != null and provinceid != '' ">
+				and m.provinceid=#{provinceid}
+			</if>
+			<if test="cityid != null and cityid != '' ">
+				and m.cityid=#{cityid}
+			</if>
+			<if test="begintime != null and begintime != '' ">
+	        <![CDATA[and m.begintime>=#{begintime}]]>
+			</if>
+			<if test="endtime != null and endtime != '' ">
+	        <![CDATA[and m.endtime<=#{endtime}]]>
+			</if>
+			<if test="hours != null and hours != '' ">
+				and m.hours=#{hours}
+			</if>
+			<if test="tranuserid != null and tranuserid != '' ">
+				and m.tranuserid=#{tranuserid}
+			</if>
+			<if test="languageid != null and languageid != '' ">
+				and m.languageid=#{languageid}
+			</if>
+			<if test="level != null and level != '' ">
+				and m.level=#{level}
+			</if>
+			<if test="specialtyname != null and specialtyname != '' ">
+				and m.specialtyname=#{specialtyname}
+			</if>
+			<if test="address != null and address != '' ">
+				and m.address=#{address}
+			</if>
+			<if test="remark != null and remark != '' ">
+				and m.remark=#{remark}
+			</if>
+			<if test="userid != null and userid != '' ">
+				and m.userid=#{userid}
+			</if>
+			<if test="bondmoney != null and bondmoney != '' ">
+				and m.bondmoney=#{bondmoney}
+			</if>
+			<if test="userfine != null and userfine != '' ">
+				and m.userfine=#{userfine}
+			</if>
+			<if test="fanyimoney != null and fanyimoney != '' ">
+				and m.fanyimoney=#{fanyimoney}
+			</if>
+			<if test="fanyifine != null and fanyifine != '' ">
+				and m.fanyifine=#{fanyifine}
+			</if>
+			<if test="state != null and state != '' ">
+				and m.state=#{state}
+			</if>
+			<if test="createtime != null and createtime != '' ">
+				and m.createtime=#{createtime}
+			</if>
+			<if test="cancel != null and cancel != '' ">
+				and m.cancel=#{cancel}
+			</if>
+			<if test="confirm != null and confirm != '' ">
+				and m.confirm=#{confirm}
+			</if>
+			<if test="username != null and username != '' ">
+				and m.username like '%${username}%'
+			</if>
+			<if test="reset != null and reset != '' ">
+				and m.reset=#{reset}
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询取消订单 -->
+	<select id="orderCancelpage" parameterType="map" resultType="map">
+		select m.* from (select o.*,l.languagename,ifnull(s.specialtyname,'')
+		specialtyname,ifnull(concat('',o.paytype),'')
+		opaytype,ifnull(dealorderid,'') odealorderid,
+		(o.hours*(select p.price
+		from t_price p where p.type=o.level and
+		p.countryid=o.countryid))
+		money,
+		(select p.price from t_price p where p.type=o.level and
+		p.countryid=o.countryid) price,
+		(select u.name from t_user u where
+		u.userid=o.userid) username,
+		ifnull((select areaname from t_sys_area
+		where areaid=o.countryid),'')
+		countryn,
+		ifnull((select areaname from
+		t_sys_area where areaid=o.provinceid),'') provincen,
+		ifnull((select
+		areaname from t_sys_area where areaid=o.cityid),'')
+		cityn,
+		(select
+		invitation from t_user where userid=o.userid) invitation
+		<include refid="orderCancelCondition" />
+		order by m.createtime desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 分页查询取消订单条数 -->
+	<select id="orderCancelpageCount" parameterType="map"
+		resultType="int">
+		select count(1) from (select o.*,(select u.name from t_user u where
+		u.userid=o.userid) username
+		<include refid="orderCancelCondition" />
+	</select>
+	<!-- 查询取消订单列表(无分页) -->
+	<select id="findDownCancelOrder" parameterType="map" resultType="map">
+		select m.* from (select
+		o.*,l.languagename,s.specialtyname,ifnull(concat('',o.paytype),'')
+		opaytype,ifnull(dealorderid,'') odealorderid,
+		(o.hours*(select p.price
+		from t_price p where p.type=o.level and
+		p.countryid=o.countryid))
+		money,
+		(select p.price from t_price p where p.type=o.level and
+		p.countryid=o.countryid) price,
+		(select u.name from t_user u where
+		u.userid=o.userid) username,
+		(select areaname from t_sys_area where
+		areaid=o.countryid) countryn,
+		(select areaname from t_sys_area where
+		areaid=o.provinceid) provincen,
+		(select areaname from t_sys_area where
+		areaid=o.cityid) cityn,
+		(select invitation from t_user where
+		userid=o.userid) invitation
+		<include refid="orderCancelCondition" />
+		order by m.createtime desc
+	</select>
+	<sql id="orderCancelCondition">
+		from t_order o LEFT JOIN t_sys_language l on o.languageid=l.languageid
+		LEFT JOIN t_sys_specialty s on o.specialtyid=s.specialtyid) m
+		<where>
+			(m.state=6 or m.state=7 or m.state=8)
+			<if test="orderid != null and orderid != '' ">
+				and m.orderid=#{orderid}
+			</if>
+			<if test="countryid != null and countryid != '' ">
+				and m.countryid=#{countryid}
+			</if>
+			<if test="provinceid != null and provinceid != '' ">
+				and m.provinceid=#{provinceid}
+			</if>
+			<if test="cityid != null and cityid != '' ">
+				and m.cityid=#{cityid}
+			</if>
+			<if test="begintime != null and begintime != '' ">
+	        <![CDATA[and m.begintime>=#{begintime}]]>
+			</if>
+			<if test="endtime != null and endtime != '' ">
+	        <![CDATA[and m.endtime<=#{endtime}]]>
+			</if>
+			<if test="hours != null and hours != '' ">
+				and m.hours=#{hours}
+			</if>
+			<if test="tranuserid != null and tranuserid != '' ">
+				and m.tranuserid=#{tranuserid}
+			</if>
+			<if test="languageid != null and languageid != '' ">
+				and m.languageid=#{languageid}
+			</if>
+			<if test="level != null and level != '' ">
+				and m.level=#{level}
+			</if>
+			<if test="specialtyname != null and specialtyname != '' ">
+				and m.specialtyname=#{specialtyname}
+			</if>
+			<if test="address != null and address != '' ">
+				and m.address=#{address}
+			</if>
+			<if test="remark != null and remark != '' ">
+				and m.remark=#{remark}
+			</if>
+			<if test="userid != null and userid != '' ">
+				and m.userid=#{userid}
+			</if>
+			<if test="bondmoney != null and bondmoney != '' ">
+				and m.bondmoney=#{bondmoney}
+			</if>
+			<if test="userfine != null and userfine != '' ">
+				and m.userfine=#{userfine}
+			</if>
+			<if test="fanyimoney != null and fanyimoney != '' ">
+				and m.fanyimoney=#{fanyimoney}
+			</if>
+			<if test="fanyifine != null and fanyifine != '' ">
+				and m.fanyifine=#{fanyifine}
+			</if>
+			<if test="createtime != null and createtime != '' ">
+				and m.createtime=#{createtime}
+			</if>
+			<if test="cancel != null and cancel != '' ">
+				and m.cancel=#{cancel}
+			</if>
+			<if test="confirm != null and confirm != '' ">
+				and m.confirm=#{confirm}
+			</if>
+			<if test="username != null and username != '' ">
+				and m.username like '%${username}%'
+			</if>
+			<if test="reset != null and reset != '' ">
+				and m.reset=#{reset}
+			</if>
+		</where>
+	</sql>
+	<!-- 查询语言 -->
+	<select id="findLanguage" parameterType="map" resultType="map">
+		select
+		* from t_sys_language
+	</select>
+	<!-- 查询专业 -->
+	<select id="findSpecialty" parameterType="map" resultType="map">
+		select * from t_sys_specialty
+	</select>
+	<!-- 修改状态 -->
+	<update id="updateOrder" parameterType="map">
+		update e_order set
+		state=#{state}
+		<if test="paytimepd !=null and paytimepd != '' ">
+			,paytime=#{paytime}
+		</if>
+		<if test="userconfirm !=null and userconfirm != '' ">
+			,userconfirm=#{userconfirm}
+		</if>
+		<if test="tranconfirm !=null and tranconfirm != '' ">
+			,tranconfirm=#{tranconfirm}
+		</if>
+		<if test="userdel !=null and userdel != '' ">
+			,userdel=#{userdel}
+		</if>
+		<if test="trandel !=null and trandel != '' ">
+			,trandel=#{trandel}
+		</if>
+		<if test="usersay !=null and usersay != '' ">
+			,usersay=#{usersay}
+		</if>
+		<if test="transay !=null and transay != '' ">
+			,transay=#{transay}
+		</if>
+		<if test="dealorderid !=null and dealorderid != '' ">
+			,dealorderid=#{dealorderid}
+		</if>
+		<if test="paytype !=null and paytype != '' ">
+			,paytype=#{paytype}
+		</if>
+		where
+		orderid=#{orderId}
+	</update>
+	<!-- 批量确认退款 -->
+	<update id="updateRefund" parameterType="java.util.List">
+		<foreach collection="list" item="w" index="index" separator=";">
+			update t_order set
+			confirm=1
+			where
+			orderid=#{w.orderid}
+		</foreach>
+	</update>
+	<!-- 批量确认退款(取消订单) -->
+	<update id="updateCancelRefund" parameterType="java.util.List">
+		<foreach collection="list" item="w" index="index" separator=";">
+			update t_order set
+			cancel=1
+			where
+			orderid=#{w.orderid}
+		</foreach>
+	</update>
+	<!-- 获取订单列表(app) -->
+	<select id="findOrderListApp" parameterType="map" resultType="map">
+		select
+		o.orderid,o.begintime,o.endtime,o.getbilltime,o.userconfirm,o.state,u.name,u.level,u.headurl,o.usersay,o.istimely,o.address,o.tranconfirm,
+		(select l.languagename from e_sys_language l where
+		l.languageid=o.needlanguageid) languagename,
+		(select price from t_price
+		where type=o.level and
+		countryid=o.countryid)*o.hours money,
+		ifnull((select areaname from e_sys_area where areaid=o.countryid),'')
+		countryn,
+		ifnull((select areaname from e_sys_area where
+		areaid=o.provinceid),'')
+		provincen,
+		ifnull((select areaname from
+		e_sys_area where areaid=o.cityid),'') cityn
+		from e_order o LEFT JOIN
+		e_user u on o.tranuserid=u.userid
+		where o.userid=#{userid} and
+		o.userdel=0
+		<if test="state != null and state != '' ">
+			and o.state in(${state})
+		</if>
+		order by o.createtime desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 确认订单(app) -->
+	<update id="updateOrderConfirmApp" parameterType="map">
+		update t_order set
+		<if test="confir == 1 ">
+			userconfirm=1
+		</if>
+		<if test="confir == 2 ">
+			tranconfirm=1
+		</if>
+		<if test="threeconfir != null and threeconfir != '' ">
+			,tranconfirm=1
+		</if>
+		<if test="state != null and state != '' ">
+			,state=#{state}
+		</if>
+		<if test="confirmtime != null and confirmtime != '' ">
+			,confirmtime=#{confirmtime}
+		</if>
+		,totalfare=#{totalfare}
+		where
+		orderid=#{orderid}
+	</update>
+	<!-- 查询订单(app) -->
+	<select id="findOrderById" parameterType="map" resultMap="tOrderResultMap">
+		select
+		t.* from e_order t where orderid=#{orderId}
+	</select>
+	<!-- 修改取消订单(用户app) -->
+	<update id="updateOrderApp" parameterType="map">
+		update t_order set
+		state=#{state},
+		canceltime=#{canceltime}
+		<if test="reset != null and reset != '' ">
+			,reset=#{reset}
+		</if>
+		<if test="userfine != null and userfine != '' ">
+			,userfine=#{userfine}
+		</if>
+		where
+		orderid=#{orderid}
+	</update>
+
+	<!-- 查询订单数量(用户端app) -->
+	<select id="findOrderCount" parameterType="map" resultType="String">
+		select COUNT(*) totalCount from
+		(select
+		o.orderid,o.begintime,o.endtime,o.getbilltime,o.userconfirm,o.state,u.name,u.headurl,o.usersay,o.istimely,o.address,o.tranconfirm,
+		(select l.languagename from e_sys_language l where
+		l.languageid=o.needlanguageid) languagename,
+		(select price from t_price
+		where type=o.level and
+		countryid=o.countryid)*o.hours money,
+		ifnull((select areaname from e_sys_area where areaid=o.countryid),'')
+		countryn,
+		ifnull((select areaname from e_sys_area where
+		areaid=o.provinceid),'')
+		provincen,
+		ifnull((select areaname from
+		e_sys_area where areaid=o.cityid),'') cityn
+		from e_order o LEFT JOIN
+		e_user u on o.tranuserid=u.userid
+		where o.userid=#{userId} and
+		o.userdel=0
+		<if test="state != null and state != '' ">
+			and o.state in(${state})
+		</if>
+		) n
+	</select>
+	<!-- 查询订单信息(app) -->
+	<select id="findOrderMessage" parameterType="map" resultType="map">
+		select
+		o.orderid,o.bondmoney,o.begintime,o.endtime,u.name,u.account,o.address,o.remark,o.level,o.state,
+		(select l.languagename from e_sys_language l where
+		l.languageid=o.needlanguageid) needlanguageid,
+		(select l.languagename
+		from e_sys_language l where l.languageid=o.motherlanguageid)
+		motherlanguageid
+		from e_order o LEFT JOIN e_user u on o.userid=u.userid
+		where
+		o.orderid=#{orderId}
+	</select>
+	<!-- p5-1账单详情(新增功能app) -->
+	<select id="findOrderFy" parameterType="map" resultType="map">
+		select o.orderid,o.getbilltime,o.fanyimoney,
+		(select price from t_price
+		where type=o.level and
+		countryid=o.countryid)*o.hours money,
+		(select
+		unit from t_price where type=o.level and countryid=o.countryid) unit
+		from t_order o where o.tranuserid=#{userid} and o.state in(3,4,5)
+		<if test="begintime != null and begintime != '' ">
+         <![CDATA[and o.getbilltime>=#{begintime}]]>
+		</if>
+		<if test="endtime != null and endtime != '' ">
+         <![CDATA[and o.getbilltime<=#{endtime}]]>
+		</if>
+		order by o.getbilltime desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 查询订单总额 -->
+	<select id="findOrderMoney" parameterType="map" resultType="map">
+		select ifnull(sum(s.money),0) money,unit from (select (select price
+		from t_price where type=o.level and countryid=o.countryid)*o.hours
+		money,
+		(select unit from t_price where type=o.level and
+		countryid=o.countryid) unit
+		from t_order o where o.tranuserid=#{userid}
+		and o.state in(3,4,5)
+		<if test="begintime != null and begintime != '' ">
+	         <![CDATA[and o.getbilltime>=#{begintime}]]>
+		</if>
+		<if test="endtime != null and endtime != '' ">
+	         <![CDATA[and o.getbilltime<=#{endtime}]]>
+		</if>
+		) s
+	</select>
+	<!-- 删除订单(用户app) -->
+	<update id="deleteOrderApp" parameterType="map">
+		update e_order set
+		<if test="usertype ==1 ">
+			userdel=1
+		</if>
+		<if test="usertype ==2 ">
+			trandel=1
+		</if>
+		where
+		orderid=#{orderid}
+	</update>
+	<!-- ===========================翻译端============================== -->
+	<!-- 获取订单列表(app) -->
+	<select id="findOrderFyListApp" parameterType="map" resultType="map">
+		select
+		o.orderid,o.begintime,o.endtime,o.getbilltime,o.tranconfirm,o.state,u.name,u.headurl,o.transay,o.istimely,o.address,o.userconfirm,
+		(select price from t_price where type=o.level and
+		countryid=o.countryid)*o.hours money,
+		(select areaname from t_sys_area
+		where areaid=o.countryid) countryn,
+		(select areaname from t_sys_area
+		where areaid=o.provinceid) provincen,
+		(select areaname from t_sys_area
+		where areaid=o.cityid) cityn
+		from t_order o LEFT JOIN t_user u on
+		o.userid=u.userid
+		where o.tranuserid=#{tranuserid} and o.trandel=0
+		<if test="state != null and state != '' ">
+			and o.state in(${state})
+		</if>
+		order by o.getbilltime desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 修改取消订单(翻译app) -->
+	<update id="updateOrderFyApp" parameterType="map">
+		update t_order set
+		state=#{state},
+		canceltime=#{canceltime}
+		<if test="reset != null and reset != '' ">
+			,reset=#{reset}
+		</if>
+		<if test="isprice != null and isprice != '' ">
+			,isprice=#{isprice}
+		</if>
+		where
+	</update>
+	<!-- 查询订单数量(翻译端app) -->
+	<select id="findOrderFyCount" parameterType="map" resultType="map">
+		select count(*) coun from t_order where state in(0,2) and
+		tranuserid=#{tranuserid} and trandel=0 union all
+		select count(*) coun
+		from t_order where state=3 and tranuserid=#{tranuserid} and trandel=0
+		union all
+		select count(*) coun from t_order where state=4 and
+		tranuserid=#{tranuserid} and trandel=0 union all
+		select count(*) coun
+		from t_order where state=5 and tranuserid=#{tranuserid} and trandel=0
+		union all
+		select count(*) coun from t_order where
+		tranuserid=#{tranuserid} and trandel=0
+	</select>
+	<!-- 获取翻译列表 -->
+	<select id="findTranslationList" parameterType="map" resultType="map">
+		select u.name,u.headurl,u.userid,u.pushcode,
+		(select languagename from
+		e_sys_language where languageid=u.needlanguageid) languagename,
+		ifnull((select round(avg(starlevel),0) from t_order_comment where
+		touserid=u.userid),0) starlevel
+		from e_user u where u.state=0 and
+		u.usertype=2 <![CDATA[and u.isexit <> 1]]>
+		<if test="languageid != null and languageid != '' ">
+			and u.needlanguageid=#{needlanguageId}
+		</if>
+		<if test="level != null and level != '' ">
+			and u.level=#{level}
+		</if>
+		<if test="countryid != null and countryid != '' ">
+			and u.countryid=#{countryId}
+		</if>
+		<if test="provinceid != null and provinceid != '' ">
+			and u.provinceid=#{provinceId}
+		</if>
+	</select>
+
+	<select id="findTranPushCode" parameterType="map" resultType="String">
+		select u.pushcode
+		from e_user u where u.state=0 and u.usertype=2 <![CDATA[and u.isexit <> 1]]>
+		<if test="needlanguageId != null and needlanguageId != '' ">
+			and u.needlanguageid=#{needlanguageId}
+		</if>
+		<if test="level != null and level != '' ">
+			and u.level in(#{level})
+		</if>
+		<if test="countryId != null and countryId != '' ">
+			and u.countryid=#{countryId}
+		</if>
+		<if test="provinceId != null and provinceId != '' ">
+			and u.provinceid=#{provinceId}
+		</if>
+	</select>
+
+	<select id="findTranId" parameterType="map" resultType="String">
+		select u.userid
+		from e_user u where u.state=0 and u.usertype=2 <![CDATA[and u.isexit <> 1]]>
+		<if test="needlanguageId != null and needlanguageId != '' ">
+			and u.needlanguageid=#{needlanguageId}
+		</if>
+		<if test="level != null and level != '' ">
+			and u.level in(#{level})
+		</if>
+		<if test="countryId != null and countryId != '' ">
+			and u.countryid=#{countryId}
+		</if>
+		<if test="provinceId != null and provinceId != '' ">
+			and u.provinceid=#{provinceId}
+		</if>
+	</select>
+
+	<!-- 24小时未支付默认取消订单 -->
+	<update id="updateOrderCancelDate" parameterType="map">
+		update t_order set
+		state=1,reset=3
+		where state=0 <![CDATA[and createtime<#{daytime}]]>
+	</update>
+	<!-- 当前时间达到预约开始时间,订单进行中改为确认订单 -->
+	<update id="updateOrderConfirmDs" parameterType="map">
+		update t_order set
+		state=3
+		where state=2 <![CDATA[and begintime<=#{daytime}]]>
+	</update>
+	<!-- 如出现一方确认订单，另一方不肯确认，设定自动（3小时内）确认订单 -->
+	<update id="updateOrderTwoConfirm" parameterType="map">
+		update t_order set
+		userconfirm=1,tranconfirm=1,state=4
+		where state=3 and
+		(userconfirm=1 and tranconfirm=0 or userconfirm=0 and
+		tranconfirm=1)
+	    <![CDATA[and confirmtime<#{daytime}]]>
+	</update>
+	<insert id="insertOrder" parameterType="map" useGeneratedKeys="true"
+		keyProperty="orderid">
+		insert into e_order (
+		orderid,
+		countryid,
+		cityid,
+		begintime,
+		endtime,
+		hours,
+		tranuserid,
+		needlanguageid,
+		level,
+		address,
+		remark,
+		userid,
+		state,
+		createtime,
+		getbilltime,
+		totalfare
+		)values (
+		#{orderid},
+		#{countryid},
+		#{cityid},
+		#{begintime},
+		#{endtime},
+		#{hours},
+		#{tranuserid},
+		#{needlanguageid},
+		#{level},
+		#{address},
+		#{remark},
+		#{userid},
+		3,
+		#{createtime},
+		#{getbilltime},
+		#{totalfare}
+		)
+	</insert>
+
+	<!-- 获取订单信息 add by yubin -->
+	<select id="getOrderInfoByUserIdAndOrderId" parameterType="map"
+		resultType="com.bluemobi.po.Order">
+		select orderid,bondmoney from t_order where
+		userid=#{userid} and orderid=#{orderid}
+	</select>
+
+	<!-- 微信支付成功修改订单状态 add by yubin -->
+	<update id="updateState" parameterType="map">
+		update t_order set
+		state=2,paytime=sysdate(),paytype=#{paytype},dealorderid=#{dealorderid}
+		where orderid=#{orderid}
+	</update>
+	<!-- 修改订单日期 add by liuchuang -->
+	<update id="updatePaymentOrder" parameterType="map">
+		update t_order set
+		hours=#{hours},
+		begintime=#{begintime},
+		endtime=#{endtime}
+		where
+		orderid=#{orderid}
+	</update>
+	<!-- 获取订单信息 add by yubin -->
+	<select id="getOrderInfoByOrderId" parameterType="map"
+		resultType="com.bluemobi.po.Order">
+		select state,bondmoney,userid from t_order where
+		orderid=#{orderid}
+	</select>
+	<!-- 修改翻译/用户评论状态 -->
+	<update id="updateSay" parameterType="map">
+		update e_order set
+		<if test="usersay != null and usersay != '' ">
+			usersay=#{usersay}
+		</if>
+		<if test="transay != null and transay != '' ">
+			transay=#{transay}
+		</if>
+		<if test="state != null and state != '' ">
+			,state=#{state}
+		</if>
+		where
+		orderid=#{orderId}
+	</update>
+	<!-- 当订单预约日达到前1天消息提醒(推送) add by liuchuang -->
+	<select id="findOrderDay" parameterType="map" resultType="String">
+		select u.token from t_order o LEFT JOIN t_user u on o.userid=u.userid
+		where <![CDATA[o.begintime<=#{daytime}]]>
+		and u.system=#{system} and o.state=2 and o.oneday=0
+	</select>
+	<!-- 当订单预约日达到前1天消息提醒(站内信) add by liuchuang -->
+	<select id="findMapList" parameterType="map" resultType="map">
+		select o.* from t_order o where <![CDATA[o.begintime<=#{daytime}]]>
+		and o.state=2 and o.oneday=0
+	</select>
+	<!-- 修改消息提醒状态 -->
+	<update id="updateOrderDay" parameterType="map">
+		update t_order set
+		oneday=1
+		where
+		orderid=#{orderid}
+	</update>
+	<!-- 获取翻译未完成的订单数 add by yubin -->
+	<select id="getTranUnFinish" parameterType="map" resultType="int">
+		select count(1) from t_order where tranuserid=#{tranuserid} and
+		(state=2 or state=3)
+	</select>
+	<!-- 取消订单获取翻译列表 liuchuang add -->
+	<select id="findTranslationOrderList" parameterType="map"
+		resultType="map">
+		select u.userid,#{maketransid} maketransid from t_user u where
+		u.state=0 and u.usertype=2 and <![CDATA[u.isexit <> 1]]>
+		<if test="languageid != null and languageid != '' ">
+			and u.languageid=#{languageid}
+		</if>
+		<if test="level != null and level != '' ">
+			and u.level=#{level}
+		</if>
+		<if test="specialtyid != null and specialtyid != '' ">
+			and u.specialtyid=#{specialtyid}
+		</if>
+		<if test="countryid != null and countryid != '' ">
+			and u.countryid=#{countryid}
+		</if>
+		<if test="provinceid != null and provinceid != '' ">
+			and u.provinceid=#{provinceid}
+		</if>
+		<if test="cityid != null and cityid !='' ">
+			and u.cityid=#{cityid}
+		</if>
+	</select>
+	<!-- 查询附近翻译 add by liuchuang -->
+	<select id="findTranslationLocalList" parameterType="map"
+		resultType="map">
+		select userid,#{maketransid} maketransid from t_user where
+		userid in(${alluserid})
+	</select>
+	<!-- 查询双方未确认订单 add by liuchuang -->
+	<select id="findOrderConList" parameterType="map" resultType="map">
+		select orderid from t_order where state=3 and userconfirm=0 and
+		tranconfirm=0 <![CDATA[and endtime<#{daytime}]]>
+	</select>
+	<!-- 查询译员是否有未确认订单 -->
+	<select id="checkOrder" parameterType="map" resultType="map">
+		select *
+		from e_order where tranuserid=#{tranId} and tranconfirm=0 and state
+		in(3,4,5) and userconfirm=0
+	</select>
+
+	<!-- 后台获取订单列表 xiaojin_wu -->
+	<select id="getList" parameterType="map" resultType="map">
+		SELECT
+		orderid,
+		CONCAT(
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area a
+		WHERE
+		t.countryid =
+		a.areaid
+		),
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area a
+		WHERE
+		t.provinceid = a.areaid
+		)
+		) place,
+		begintime,
+		endtime,
+		hours,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user b
+		WHERE
+		b.userid
+		= t.tranuserid
+		) transname,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language c
+		WHERE
+		c.languageid = t.motherlanguageid
+		) motherlanguage,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language d
+		WHERE
+		d.languageid = t.needlanguageid
+		)
+		needlanguage,
+		(select typename from e_usertype g where t.`level` =
+		g.typeid) level,
+		(
+		SELECT
+		professionname
+		FROM
+		e_profession e
+		WHERE
+		e.professionid = t.professionid
+		) professionname,
+		address,
+		remark,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user f
+		WHERE
+		f.userid = t.userid
+		) username,
+		state,
+		createtime,
+		cancel,
+		canceltime,
+		paytime,
+		userdel,
+		trandel,
+		usersay,
+		transay,
+		paytype,
+		dealorderid,
+		totalfare,
+		location
+		FROM
+		e_order t
+
+		<if test="state != null and state != '' ">
+			WHERE t.state =#{state}
+		</if>
+		limit #{offset},#{rows}
+	</select>
+
+	<select id="getOrderListCounts" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		(
+		SELECT
+		orderid,
+		CONCAT(
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area a
+		WHERE
+		t.countryid =
+		a.areaid
+		),
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area a
+		WHERE
+		t.provinceid = a.areaid
+		)
+		) place,
+		begintime,
+		endtime,
+		hours,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user b
+		WHERE
+		b.userid
+		= t.tranuserid
+		) transname,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language c
+		WHERE
+		c.languageid = t.motherlanguageid
+		) motherlanguage,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language d
+		WHERE
+		d.languageid = t.needlanguageid
+		)
+		needlanguage,
+		LEVEL,
+		(
+		SELECT
+		professionname
+		FROM
+		e_profession e
+		WHERE
+		e.professionid = t.professionid
+		) professionname,
+		address,
+		remark,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user f
+		WHERE
+		f.userid = t.userid
+		) username,
+		state,
+		createtime,
+		cancel,
+		canceltime,
+		paytime,
+		userdel,
+		trandel,
+		usersay,
+		transay,
+		paytype,
+		dealorderid,
+		location
+		FROM
+		e_order t
+		) orderlist
+	</select>
+</mapper> 

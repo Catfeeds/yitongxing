@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.MessageDao">
+	<resultMap type="com.bluemobi.po.Message" id="tMessageResultMap">
+           <result column="msgid" property="msgid"/>
+           <result column="title" property="title"/>
+           <result column="content" property="content"/>
+           <result column="createtime" property="createtime"/>
+           <result column="name" property="name"/>
+    </resultMap>
+	
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="tMessageResultMap" />
+	<resultMap id="findResultMap"  type="java.util.HashMap" extends="tMessageResultMap" />
+	
+	
+	<delete id="deleteMessage" parameterType="java.lang.String">
+		delete from t_message where msgid=#{msgid}
+	</delete>
+	
+	<delete id="deleteMessageUser" parameterType="java.lang.String">
+		delete from t_message_user where msgid=#{msgid}
+	</delete>
+	
+	<insert id="insertMessage" useGeneratedKeys="true" keyProperty="msgid" parameterType="com.bluemobi.po.Message">  
+	    insert into t_message(title,content,createtime)  
+	    values(#{title},#{content},#{createtime})  
+	</insert>
+	
+	<insert id="bathInsert" parameterType="java.util.List">
+     	insert into t_message_user(msgid,userid,senduserid)
+     	values
+     	<foreach collection="list" item="item" index="index" separator="," >  
+	    	(#{item.msgid},#{item.userid},#{item.senduserid})  
+	    </foreach>  
+     </insert>
+	
+	
+	<select id="getMessageById" parameterType="java.lang.String" resultType="com.bluemobi.po.Message">
+		select * from t_message where msgid = #{msgid};
+	</select>
+	
+	<select id="getAllUserId" resultType="java.lang.Integer">
+		select userid from t_user
+	</select>
+	
+	
+	
+	<select id="getMessageListApp" parameterType="map" resultType="map">
+		select m.title,m.content,mu.isread,mu.messageuserid,m.createtime
+		from e_message_user mu
+		left join e_message m on mu.msgid = m.msgid
+		where mu.userid = #{userid}
+		order by m.createtime desc 
+		limit #{offset},#{rows}
+	</select>
+	
+	<select id="getMessageListCount" parameterType="map" resultType="int">
+	   select count(1) from t_message
+	   <where>
+			1 = 1
+			<if test="createtime != null and createtime != ''">
+				and date_format(createtime,'%Y-%m-%d')=#{createtime}
+			</if>
+			<if test="content != null and content != ''">
+				and content like CONCAT('%',#{content},'%')
+			</if>
+		</where>
+	</select>
+	<!-- 添加消息 by LC -->
+	<insert id="insertMe" parameterType="com.bluemobi.po.Maketrans" useGeneratedKeys="true" keyProperty="msgid">
+	   insert into e_message (
+	   	 title,
+	     content,
+	     createtime
+	   )values (
+	     #{title},
+	     #{content},
+	     #{createtime}
+	   )
+	</insert>
+	<!-- 添加消息发送人信息 -->
+	<insert id="insertMeUser" parameterType="map">
+	   insert into e_message_user (
+	     msgid,
+	     userid,
+	     isread,
+	     senduserid
+	   )values (
+	     #{msgid},     
+	     #{userid},
+	     #{isread},	
+	     #{senduserid}
+	   )
+	</insert>
+	<select id="getMessageList" resultMap="tMessageResultMap" parameterType="map">
+		select distinct m.msgid,m.title,m.content,date_format(m.createtime,'%Y-%m-%d') createtime,u.name
+		<include refid="pageCondition" />
+	    order by m.createtime desc limit #{offset},#{rows}
+    </select>
+	
+	
+	<sql id="pageCondition">
+		from t_message m 
+		left join t_message_user mu on m.msgid= mu.msgid 
+		left join t_user u on mu.senduserid = u.userid
+		<where>
+			1 = 1
+			<if test="createtime != null and createtime != ''">
+				and date_format(m.createtime,'%Y-%m-%d')=#{createtime}
+			</if>
+			<if test="content != null and content != ''">
+				and m.content like CONCAT('%',#{content},'%')
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 获取用户未读消息数 -->
+	<select id="messageCount" parameterType="map" resultType="int">
+		select count(*) from t_message_user WHERE isread='0' and userid=#{userid}
+	</select>
+	
+	<!-- 修改已读状态-->
+	<update id="updateRead" parameterType="map">
+		update t_message_user set isread=1 where messageuserid=#{id}
+	</update>
+	
+	<!-- app用户删除消息 -->
+	<delete id="deleteApp" parameterType="map">
+		delete from t_message_user where messageuserid=#{id} and userid=#{userid}
+	</delete>
+</mapper> 

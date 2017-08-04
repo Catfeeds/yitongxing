@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.MaketransDao">
+	<resultMap id="tMaketransResultMap" type="com.bluemobi.po.Maketrans">
+		<id property="maketransid" column="maketransid" />
+		<result property="userid" column="userid" />
+		<result property="countryid" column="countryid" />
+		<result property="provinceid" column="provinceid" />
+		<result property="cityid" column="cityid" />
+		<result property="begintime" column="begintime" />
+		<result property="endtime" column="endtime" />
+		<result property="hours" column="hours" />
+		<result property="motherlanguageid" column="motherlanguageid" />
+		<result property="needlanguageid" column="needlanguageid" />
+		<result property="level" column="level" />
+		<result property="address" column="address" />
+		<result property="remark" column="remark" />
+		<result property="createtime" column="createtime" />
+		<result property="state" column="state" />
+		<result property="tranuserid" column="tranuserid" />
+		<result property="getbilltime" column="getbilltime" />
+	</resultMap>
+	<resultMap id="pageResultMap" type="java.util.HashMap"
+		extends="tMaketransResultMap"></resultMap>
+	<resultMap id="findResultMap" type="java.util.HashMap"
+		extends="tMaketransResultMap"></resultMap>
+
+	<insert id="insertMake" parameterType="map" useGeneratedKeys="true"
+		keyProperty="maketransid">
+		insert into e_maketrans (
+		userid,
+		countryid,
+		<if test="cityid != null and cityid != '' ">
+			cityid,
+		</if>
+		begintime,
+		endtime,
+		hours,
+		motherlanguageid,
+		needlanguageid,
+		level,
+		remark,
+		address,
+		state,
+		createtime
+		<if test="location != null and location != '' ">
+			,location
+		</if>
+		)values (
+		#{userid},
+		#{countryid},
+		<if test="cityid != null and cityid != '' ">
+			#{cityid},
+		</if>
+		#{begintime},
+		#{endtime},
+		#{hours},
+		#{motherLanguageid},
+		#{needLanguageid},
+		#{level},
+		#{remark},
+		#{address},
+		#{state},
+		#{createtime}
+		<if test="location != null and location != '' ">
+			,#{location}
+		</if>
+		)
+	</insert>
+
+	<delete id="delete" parameterType="map">
+		delete from
+		e_maketrans
+		where
+		maketransid=#{maketransId}
+	</delete>
+	<!-- 删除预约单人 -->
+	<delete id="deleteMakeUser" parameterType="map">
+		delete from
+		e_maketrans_user
+		where
+		maketransid=#{maketransId}
+	</delete>
+	<!-- 删除预约单(by liuchuang) -->
+	<delete id="deleteMake" parameterType="map">
+		delete from
+		t_maketrans
+		where userid=#{userid} 
+	    <![CDATA[and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+	</delete>
+	<!-- 删除预约单人(by liuchuang) -->
+	<delete id="deleteDateMakeUser" parameterType="map">
+		delete from
+		t_maketrans_user
+		where
+		maketransid in
+		(select maketransid from
+		t_maketrans where userid=#{userid} 
+	    <![CDATA[and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>)
+	</delete>
+
+	<!-- 查询预约订单信息(app短信通知) -->
+	<select id="findMaketTrans" parameterType="map" resultType="map">
+		select
+		s.userid,
+		s.begintime,
+		s.endtime,
+		s.level,
+		(select a.areaname from
+		t_sys_area a where a.areaid=s.countryid) country,
+		(select a.areaname
+		from t_sys_area a where a.areaid=s.provinceid)
+		province,
+		(select
+		a.areaname from t_sys_area a where a.areaid=s.cityid ) city
+		from
+		(select * from t_maketrans where userid=#{userid} where
+		createtime=NOW()) s
+	</select>
+
+	<!-- 查询评价列表(app) -->
+	<select id="findUserEval" parameterType="map" resultType="map">
+		select
+		c.*,u.name,u.headurl from t_order_comment c LEFT JOIN t_user u on
+		c.fromuserid=u.userid where c.touserid=#{userid}
+		order by c.createtime
+		desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 查询我的评价列表(app) -->
+	<select id="findMyEval" parameterType="map" resultType="map">
+		select
+		c.*,u.name,u.headurl from t_order_comment c LEFT JOIN t_user u on
+		c.touserid=u.userid where c.fromuserid=#{userid}
+		order by c.createtime
+		desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 首页(获取抢单列表app) -->
+	<select id="findMaketransList" parameterType="map" resultType="map">
+		select mb.* from e_maketrans_user mu LEFT JOIN
+		(select
+		TIMESTAMPDIFF(HOUR,m.begintime,m.endtime)
+		hour,u.name,m.maketransid,m.remark,u.headurl,u.userid,m.createtime,m.state,
+		m.countryid,m.provinceid,m.cityid,m.address,m.istimely,m.level,u.sex,m.needlanguageid,
+		(select areaname from e_sys_area where areaid=m.countryid) countryn,
+		(select areaname from e_sys_area where areaid=m.cityid) cityn,
+		(select
+		l.languagename from e_sys_language l where
+		l.languageid=m.needlanguageid) languagename
+		from e_maketrans m LEFT
+		JOIN e_user u on m.userid=u.userid) mb on
+		mu.maketransid=mb.maketransid where mu.userid=#{userId} and mb.state=0
+		<if test="level != null and level != ''">
+			and mb.level=#{level}
+		</if>
+		<if test="countryid != null and countryid != '' ">
+			and mb.countryid=#{countryid}
+		</if>
+		<if test="provinceid != null and provinceid != '' ">
+			and mb.cityid=#{provinceid}
+		</if>
+		<if test="needlanguageid != null and needlanguageid != '' ">
+			and mb.needlanguageid in(#{needlanguageid})
+		</if>
+		order by mb.createtime desc
+	</select>
+	<!-- 查询预约单信息 -->
+	<select id="findMaketMap" parameterType="map" resultType="map">
+		SELECT
+		t.* FROM e_maketrans t WHERE t.maketransid=#{maketransId}
+	</select>
+	<!-- 查询翻译信息 -->
+	<select id="findUser" parameterType="map" resultType="map">
+		select *
+		from t_user where userid=#{tranuserid}
+	</select>
+	<!-- 查询翻译是否可以接单(抢单) -->
+	<select id="findMaketMapList" parameterType="map" resultType="map">
+		select userid from e_maketrans where tranuserid=#{userid} 
+	    <![CDATA[and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		union all
+		select userid from e_order where tranuserid=#{userid} 
+	    <![CDATA[and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		and (state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0)
+	</select>
+	<!-- 查询翻译是否可以接单(无预约单) -->
+	<select id="findMaketDeleMapList" parameterType="map"
+		resultType="map">
+		select userid from t_maketrans where tranuserid=#{tranuserid}
+	    <![CDATA[and userid <> #{userid} and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		union all
+		select userid from t_order where tranuserid=#{tranuserid} 
+	    <![CDATA[and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		and (state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0)
+	</select>
+	<!-- 查询翻译是否可以接单(有预约单) -->
+	<select id="findMaketOrMapList" parameterType="map" resultType="map">
+		select userid from t_maketrans where tranuserid=#{userid}
+		<if test="maketransid != null and maketransid != '' ">
+	   		<![CDATA[and maketransid <> #{maketransid}]]>
+		</if>
+	    <![CDATA[
+	    and ((begintime<#{endtime} and begintime>=#{begintime}
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		union all
+		select userid from t_order where tranuserid=#{userid}
+		<if test="orderidid != null and orderidid != '' ">
+	   		<![CDATA[and orderid <> #{orderid}]]>
+		</if>
+	    <![CDATA[and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		and (state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0)
+	</select>
+	<!-- 查询用户是否可以下单(订单表) -->
+	<select id="findUserOrderList" parameterType="map" resultType="map">
+		select orderid from t_order where userid=#{userid} 
+	    <![CDATA[and ((begintime<#{instantendtime} and begintime>=#{instantbegintime} 
+	    or endtime<#{instantendtime} and endtime>=#{instantbegintime}) 
+	    or begintime<=#{instantbegintime} and endtime>#{instantendtime})]]>
+		and (state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0)
+	</select>
+	<!-- 查询用户该时间内的预约单 -->
+	<select id="findUserMakeList" parameterType="map" resultType="map">
+		select userid from t_maketrans where userid=#{userid} 
+	    <![CDATA[and ((begintime<#{reservationendtime} and begintime>=#{reservationbegintime} 
+	    or endtime<#{reservationendtime} and endtime>=#{reservationbegintime}) 
+	    or begintime<=#{reservationbegintime} and endtime>#{reservationendtime})]]>
+	</select>
+	<!-- 抢单成功修改状态 -->
+	<update id="updateMaket" parameterType="map">
+		update e_maketrans set
+		state=#{state},
+		getbilltime=#{getbilltime},
+		tranuserid=#{tranId}
+		where
+		maketransid=#{maketransId}
+	</update>
+	<!--查询e_maketrans -->
+	<select id="findMakeTransListApp" parameterType="map"
+		resultType="map">
+		select
+		o.maketransid,o.begintime,o.endtime,o.getbilltime,o.state,u.name,u.level,u.headurl,o.istimely,o.address,
+		(select l.languagename from e_sys_language l where
+		l.languageid=o.needlanguageid) languagename,
+		(select price from t_price
+		where type=o.level and
+		countryid=o.countryid)*o.hours money,
+		ifnull((select areaname from e_sys_area where areaid=o.countryid),'')
+		countryn,
+		ifnull((select areaname from e_sys_area where
+		areaid=o.provinceid),'')
+		provincen,
+		ifnull((select areaname from
+		e_sys_area where areaid=o.cityid),'') cityn
+		from e_maketrans o LEFT
+		JOIN e_user u on o.tranuserid=u.userid
+		where o.userid=#{userid}
+		<if test="state != null and state != '' ">
+			and o.state in(${state})
+		</if>
+		order by o.createtime desc
+		limit #{offset},#{rows}
+	</select>
+
+
+	<!-- 查询翻译可能要付费的数量 -->
+	<select id="findCount" parameterType="map" resultType="int">
+		select
+		count(1) from (select userid from t_order where tranuserid=#{userid}
+		and (state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0)
+		union all
+		select userid from t_maketrans where tranuserid=#{userid}) s
+	</select>
+	<!-- 查询确认预约信息 -->
+	<select id="findPaymentOrder" parameterType="map" resultType="map">
+		select
+		o.orderid,u.name,u.school,o.level,o.begintime,o.endtime,o.hours,o.bondmoney,o.countryid,
+		(select areaname from t_sys_area where areaid=o.countryid) countryidn,
+		(select areaname from t_sys_area where areaid=o.provinceid)
+		provinceidn,
+		(select areaname from t_sys_area where areaid=o.cityid)
+		cityidn,
+		((select price from t_price where type=o.level and
+		countryid=o.countryid)*o.hours) price,
+		(select price from t_price where
+		type=o.level and countryid=o.countryid) money
+		from t_order o left join
+		t_user u on o.tranuserid=u.userid where o.orderid=#{orderid}
+	</select>
+	<!-- 添加预约单人 -->
+	<insert id="insertMakeUser" parameterType="map">
+		insert into
+		e_maketrans_user (
+		maketransid,
+		userid
+		)values (
+		#{maketransid},
+		#{transId}
+		)
+	</insert>
+	<!-- 查询翻译是否抢该用户的预约单 -->
+	<select id="findMakeTran" parameterType="map" resultType="map">
+		select
+		max(m.maketransid) maketransid from e_maketrans m
+		where
+		m.tranuserid=#{truserid} and m.userid=#{userid} and m.state=1
+	</select>
+	<!-- 24小时内未有人抢单将自动删除预约单 -->
+	<delete id="deleteMakeDate" parameterType="map">
+		delete from
+		t_maketrans
+		where
+	   <![CDATA[endtime<#{daytime}]]>
+		and state=0
+	</delete>
+	<!-- 查询用户是否可以下单(不算本身订单) -->
+	<select id="findUserOrder" parameterType="map" resultType="map">
+		select userid from t_order where userid=#{userid}
+	    <![CDATA[and orderid <> #{orderid} and ((begintime<#{endtime} and begintime>=#{begintime} 
+	    or endtime<#{endtime} and endtime>=#{begintime}) 
+	    or begintime<=#{begintime} and endtime>#{endtime})]]>
+		and (state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0)
+	</select>
+	<!-- 翻译取消订单添加预约单(app) liuchuang add -->
+	<insert id="insertOrderMake" parameterType="map"
+		useGeneratedKeys="true" keyProperty="maketransid">
+		insert into t_maketrans (
+		userid,
+		countryid,
+		provinceid,
+		cityid,
+		begintime,
+		endtime,
+		hours,
+		languageid,
+		level,
+		<if test="specialtyid != null and specialtyid != '' ">
+			specialtyid,
+		</if>
+		address,
+		remark,
+		createtime,
+		istimely,
+		tip
+		<if test="location != null and location != '' ">
+			,location
+		</if>
+		)values (
+		#{userid},
+		#{countryid},
+		#{provinceid},
+		#{cityid},
+		#{begintime},
+		#{endtime},
+		#{hours},
+		#{languageid},
+		#{level},
+		<if test="specialtyid != null and specialtyid != '' ">
+			#{specialtyid},
+		</if>
+		#{address},
+		#{remark},
+		#{createtime},
+		#{istimely},
+		#{tip}
+		<if test="location != null and location != '' ">
+			,#{location}
+		</if>
+		)
+	</insert>
+	<!-- 翻译取消订单添加预约单人(app) liuchuang add -->
+	<insert id="insertOrderMakeUser" parameterType="java.util.List">
+		insert into t_maketrans_user (
+		maketransid,
+		userid
+		)values
+		<foreach collection="list" item="w" index="index" separator=",">
+			(
+			#{w.maketransid},
+			#{w.userid}
+			)
+		</foreach>
+	</insert>
+	<!-- 获取预约单列表(app) liuchuang add -->
+	<select id="findMakeList" parameterType="map" resultType="map">
+		select
+		begintime,endtime,maketransid,state,istimely from t_maketrans where
+		userid=#{userid}
+		order by createtime desc
+		limit #{offset},#{rows}
+	</select>
+	<!-- 获取预约单详情(app) liuchuang add -->
+	<select id="findMakeBean" parameterType="map" resultType="map">
+		select
+		m.level,m.maketransid,m.begintime,m.endtime,m.hours,ifnull(m.address,'')
+		address,m.state,ifnull(m.remark,'') remark,m.createtime,m.getbilltime,
+		(select areaname from t_sys_area where areaid=m.countryid)
+		countryname,
+		(select areaname from t_sys_area where
+		areaid=m.provinceid) provincename,
+		(select areaname from t_sys_area
+		where areaid=m.cityid) cityname,
+		(select languagename from
+		t_sys_language where languageid=m.languageid) languagename,
+		ifnull((select specialtyname from t_sys_specialty where
+		specialtyid=m.specialtyid),'') specialtyname,
+		(select price*m.hours
+		from t_price where type=m.level and countryid=m.countryid) money,
+		(select unit from t_price where type=m.level and
+		countryid=m.countryid) unit
+		from t_maketrans m where
+		m.maketransid=#{maketransid}
+	</select>
+	<!-- 预约单取消翻译人(app) liuchuang add -->
+	<update id="updateMakeTran" parameterType="map">
+		update t_maketrans set
+		getbilltime=#{getbilltime},
+		state=#{state},
+		tranuserid=#{tranuserid}
+		where
+		maketransid=#{maketransid}
+	</update>
+	<!-- 删除预约单(by liuchuang) -->
+	<delete id="deleteMakeTrans" parameterType="map">
+		delete from
+		t_maketrans
+		where maketransid=#{maketransid}
+	</delete>
+	<!-- 查询筛选条件查询费用(app) liuchuang add -->
+	<select id="findMakePrice" parameterType="map" resultType="map">
+		select (price*#{hours}) money,unit from t_price where type=#{type} and
+		countryid=#{countryid}
+	</select>
+	<!-- 查询可能最大罚金 liuchuang add -->
+	<select id="findFanyifinemap" parameterType="map" resultType="String">
+		select ifnull(sum(money),0) from (
+		select fanyifine money from t_order
+		where tranuserid=#{userid} and (state
+		in(0,2) or state=3 and
+		userconfirm=0 and tranconfirm=0) and istimely=0
+		and
+		fanyifine>fanyimoney union all
+		select (select price from t_price where
+		countryid=s.countryid and type=(case
+		when s.level=2 then 7 else 9 end))
+		money from t_maketrans s where
+		s.tranuserid=#{userid} and s.istimely=0
+			<![CDATA[and ((select price from t_price where countryid=s.countryid and type=(case when s.level=2 then 7 else 9 end)) > (select price from t_price where countryid=s.countryid and type=(case when s.level=2 then 6 else 8 end)))]]>
+		) m
+	</select>
+	<!-- 及时订单当前月已取消次数 liuchuang add -->
+	<select id="findCanCleSum" parameterType="map" resultType="String">
+		select count(1) from t_order where
+		date_format(createtime,'%Y-%m')=date_format(now(),'%Y-%m') and state
+		in(7,8) and tranuserid=#{userid}
+	</select>
+	<!-- 及时订单可能取消次数 liuchuang add -->
+	<select id="findKnCanCleSum" parameterType="map" resultType="String">
+		select count(1) money from t_order where tranuserid=#{userid} and
+		(state in(0,2) or state=3 and userconfirm=0 and tranconfirm=0) and
+		istimely=1
+	</select>
+	<!-- 本月取消次数 -->
+	<select id="findCancelSum" parameterType="map" resultType="int">
+		select cancelsum from e_user where userid=#{tranId}
+	</select>
+	<!-- 获取订单时长 -->
+	<select id="getOrderHour" parameterType="map" resultType="int">
+		select
+		TIMESTAMPDIFF(HOUR,s.begintime,s.endtime) hour from e_maketrans s
+		where s.maketransid=#{maketransId}
+	</select>
+	<!-- 查询预约单翻译会费 liuchuang add -->
+	<select id="findTraMoney" parameterType="map" resultType="String">
+		select
+		(select price from t_price where type=(case when s.level=2 then 6
+		else
+		8 end) and countryid=s.countryid) from t_maketrans s where
+		s.maketransid=#{maketransid}
+	</select>
+	<!-- 查询可能扣除最大会费(普通预约单) liuchuang add -->
+	<select id="findFanYiOrder" parameterType="map" resultType="int">
+		select ifnull(sum(money),0) from (
+		select fanyimoney money from t_order
+		where tranuserid=#{userid} and (state
+		in(0,2) or state=3 and
+		userconfirm=0 and tranconfirm=0) and istimely=0
+		and
+		fanyimoney>fanyifine union all
+		select (select price from t_price where
+		countryid=s.countryid and type=(case
+		when s.level=2 then 6 else 8 end))
+		money from t_maketrans s where
+		s.tranuserid=#{userid} and s.istimely=0
+			<![CDATA[and ((select price from t_price where countryid=s.countryid and type=(case when s.level=2 then 7 else 9 end)) < (select price from t_price where countryid=s.countryid and type=(case when s.level=2 then 6 else 8 end)))]]>
+		) m
+	</select>
+	<!-- 查询该预约单的取消罚金和会费 liuchuang add -->
+	<select id="findPriceMap" parameterType="map" resultType="map">
+		select
+		(select price from t_price where countryid=s.countryid and type=(case
+		when s.level=2 then 6 else 8 end)) fanyimoney,
+		(select price from
+		t_price where countryid=s.countryid and type=(case when s.level=2 then
+		7 else 9 end)) fanyifine
+		from t_maketrans s where
+		s.maketransid=#{maketransid}
+	</select>
+	<!-- 查询翻译会费 liuchuang add -->
+	<select id="findMakeNu" parameterType="map" resultType="String">
+		select
+		price from t_price where type=#{type} and countryid=#{countryid}
+	</select>
+	<!-- 查询当月是否刷新 liuchuang add -->
+	<select id="findIsUpdate" parameterType="map" resultType="map">
+		select
+		* from t_isupdate where id=1
+	</select>
+	<!-- 修改刷新状态 liuchuang add -->
+	<update id="updateIsUpdate" parameterType="map">
+		update t_isupdate set
+		isupdate=#{isupdate},
+		createdate=#{createdate}
+		where
+		id=1
+	</update>
+	<!-- 查询翻译未完成的及时单 liuchuang add -->
+	<select id="findFyIsList" parameterType="map" resultType="map">
+		select
+		* from t_order where tranuserid=#{userid} and (state in(0,2) or
+		state=3 and userconfirm=0 and tranconfirm=0) and istimely=1
+	</select>
+	<!-- 查询用户未完成的及时单 -->
+	<select id="findUserIsList" parameterType="map" resultType="map">
+		select userid from t_order where userid=#{userid} and (state in(0,2)
+		or state=3 and userconfirm=0 and tranconfirm=0) and istimely=1
+		union
+		all
+		select userid from t_maketrans where userid=#{userid} and
+		istimely=1
+	</select>
+
+
+	<!-- 后台获取预约订单列表 xiaojin_wu -->
+	<select id="getList" parameterType="map" resultType="map">
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		maketransid,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user a
+		WHERE
+		a.userid =
+		t.userid
+		) username,
+		CONCAT(
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area b
+		WHERE
+		t.countryid = b.areaid
+		),
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area c
+		WHERE
+		t.provinceid = c.areaid
+		)
+		) place,
+		begintime,
+		endtime,
+		hours,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language d
+		WHERE
+		d.languageid = t.motherlanguageid
+		) motherlanguage,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language e
+		WHERE
+		e.languageid = t.needlanguageid
+		) needlanguage,
+		(
+		SELECT
+		typename
+		FROM
+		e_usertype g
+		WHERE
+		t.`level` = g.typeid
+		) level,
+		address,
+		state,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user a
+		WHERE
+		a.userid = t.userid
+		) tranusername,
+		getbilltime,
+		totalfare,
+		location
+		FROM
+		e_maketrans t
+
+		<if test="state != null and state != '' ">
+			WHERE t.state =#{state}
+		</if>
+		) m
+
+		limit #{offset},#{rows}
+	</select>
+
+	<!-- 后台获取预约订单数量 xiaojin_wu -->
+	<select id="getPreOrderListCounts" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		(
+		SELECT
+		maketransid,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user a
+		WHERE
+		a.userid = t.userid
+		) username,
+		CONCAT(
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area b
+		WHERE
+		t.countryid = b.areaid
+		),
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area c
+		WHERE
+		t.provinceid = c.areaid
+		)
+		) place,
+		begintime,
+		endtime,
+		hours,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language d
+		WHERE
+		d.languageid = t.motherlanguageid
+		) motherlanguage,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language e
+		WHERE
+		e.languageid = t.needlanguageid
+		) needlanguage,
+		(
+		SELECT
+		typename
+		FROM
+		e_usertype g
+		WHERE
+		t.`level` = g.typeid
+		) level,
+		address,
+		state,
+		(
+		SELECT
+		NAME
+		FROM
+		e_user a
+		WHERE
+		a.userid = t.userid
+		) tranusername,
+		getbilltime,
+		totalfare,
+		location
+		FROM
+		e_maketrans t
+		) m
+
+	</select>
+
+</mapper> 

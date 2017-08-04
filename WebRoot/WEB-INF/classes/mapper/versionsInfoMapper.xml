@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.VersionsInfoDao">
+
+	<resultMap id="eVersionsInfoResultMap" type="com.bluemobi.po.VersionsInfo">
+		<id property="versionsid" column="versionsid" />
+		<result property="versions" column="versions" />
+		<result property="ctime" column="ctime" />
+		<result property="fileurl" column="fileurl" />
+		<result property="context" column="context" />
+		<result property="istype" column="istype" />
+	</resultMap>
+	<resultMap id="pageResultMap"  type="java.util.HashMap" extends="eVersionsInfoResultMap"></resultMap>
+	<resultMap id="findResultMap"  type="java.util.HashMap"></resultMap>
+
+	<insert id="insert" parameterType="com.bluemobi.po.VersionsInfo">
+	   insert into t_versions_info (
+	     versionsid,
+	     versions,
+	     ctime,
+	     fileurl,
+	     context,
+	     istype
+	   )values (
+	     #{versionsid},
+	     #{versions},
+	     #{ctime},
+	     #{fileurl},
+	     #{context},
+	     #{istype}
+	   )
+	</insert>
+
+	<update id="update" parameterType="com.bluemobi.po.VersionsInfo">
+	   update e_versions_info set
+	     versionsid=#{versionsid},
+	     versions=#{versions},
+	     ctime=#{ctime},
+	     fileurl=#{fileurl},
+	     context=#{context},
+	     istype=#{istype}
+	   where 
+	    versionsid=#{versionsid} 
+	</update>
+
+	<delete id="delete" parameterType="map">
+	   delete from 
+	     e_versions_info 
+	   where 
+	    versionsid=#{versionsid} 
+	</delete>
+
+	<select id="get" parameterType="map" resultMap="eVersionsInfoResultMap">
+	   select 
+	    versionsid,
+	    versions,
+	    ctime,
+	    fileurl,
+	    context,
+	    istype
+	   from e_versions_info
+	   where 
+	    versionsid=#{versionsid} 
+	</select>
+
+	<select id="findOne" parameterType="map" resultMap="findResultMap">
+	   select 
+	    versionsid,
+	    versions,
+	    ctime,
+	    fileurl,
+	    context,
+	    istype
+	   from e_versions_info
+	   where 
+	    versionsid=#{versionsid} 
+	</select>
+
+	<!-- 查询app版本信息 	xiaojin_wu -->
+	<select id="find" parameterType="map" resultMap="findResultMap">
+	   select 
+	     versionsid,
+	     versions,
+	     ctime,
+	     fileurl,
+	     context,
+	     istype
+	   from e_versions_info
+	   <where>
+	     <if test="versionsid != null and versionsid != ''">
+	        versionsid=#{versionsid}
+	     </if>
+	     <if test="versions != null and versions != ''">
+	        and versions=#{versions}
+	     </if>
+	     <if test="ctime != null and ctime != ''">
+	        and ctime=#{ctime}
+	     </if>
+	     <if test="fileurl != null and fileurl != ''">
+	        and fileurl=#{fileurl}
+	     </if>
+	     <if test="context != null and context != ''">
+	        and context=#{context}
+	     </if>
+	     <if test="istype != null and istype != ''">
+	        and istype=#{istype}
+	     </if>
+	   </where>
+	    order by ctime desc
+	   limit #{offset},#{rows}
+	</select>
+	
+	<!-- 获取待审核列表数量 xiaojin_wu -->
+	<select id="getVersionsCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM e_versions_info
+	</select>
+	
+</mapper> 

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="conf"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/interface"/>
+	<classpathentry kind="lib" path="/libs/lib/antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/aopalliance.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/aspectjrt-1.5.3.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/aspectjweaver-1.5.3.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/bcprov-jdk16-145-1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/blueMobiWebCore.1.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/c3p0-0.9.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-beanutils-1.8.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-codec-1.8.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-collections-3.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-email-1.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-fileupload-1.2.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-httpclient-3.0.1.jar" sourcepath="D:/maven/maven-dependcies/commons-httpclient/commons-httpclient/3.0.1/commons-httpclient-3.0.1-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-net-3.3.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-pool2-2.0.jar" sourcepath="D:/maven/maven-dependcies/org/apache/commons/commons-pool2/2.0/commons-pool2-2.0-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/druid-0.2.20.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/dubbo-2.5.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/ezmorph-1.0.6.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/fastjson-1.1.8.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/flex-messaging-common.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/flex-messaging-core.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/guava-17.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/hibernate-commons-annotations-4.0.5.Final.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/hibernate-core-4.3.9.Final.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/httpclient-4.2.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/httpcore-4.2.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jackson-annotations-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jackson-core-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jackson-databind-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jackson-mapper-asl-1.9.13.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jandex-1.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/java-json.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/javacsv.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/JavaPNS_2.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/javapns-jdk16-163.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/javassist-3.18.1-GA.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jaxen-1.1-beta-6.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jboss-logging-3.1.3.GA.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jboss-logging-annotations-1.2.0.Beta1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jboss-transaction-api_1.2_spec-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jdom.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jedis-2.7.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jsch-0.1.53.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/json-smart.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jsr305-3.0.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jstl-1.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jta-1.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/mail.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/mongo-java-driver-2.13.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/mybatis-3.2.7.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/mybatis-paginator.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/mybatis-spring-1.2.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/netty-3.2.5.Final.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/postmsg-ump-2.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/protobuf-java-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/slf4j-api-1.5.11.jar" sourcepath="D:/maven/maven-dependcies/org/slf4j/slf4j-api/1.5.11/slf4j-api-1.5.11-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/slf4j-log4j12-1.5.0.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-aspects-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-beans-4.1.6.RELEASE.jar" sourcepath="D:/maven/maven-dependcies/org/springframework/spring-beans/4.1.6.RELEASE/spring-beans-4.1.6.RELEASE-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-context-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-context-support-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-core-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-data-commons-1.10.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-data-mongodb-1.7.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-expression-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-instrument-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-instrument-tomcat-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-jdbc-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-jms-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-messaging-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-orm-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-oxm-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-test-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-tx-4.1.6.RELEASE.jar" sourcepath="D:/maven/maven-dependcies/org/springframework/spring-tx/4.1.6.RELEASE/spring-tx-4.1.6.RELEASE-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-web-4.1.6.RELEASE.jar" sourcepath="D:/maven/maven-dependcies/org/springframework/spring-web/4.1.6.RELEASE/spring-web-4.1.6.RELEASE-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-webmvc-4.1.6.RELEASE.jar" sourcepath="D:/maven/maven-dependcies/org/springframework/spring-webmvc/4.1.6.RELEASE/spring-webmvc-4.1.6.RELEASE-sources.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-webmvc-portlet-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-websocket-4.1.6.RELEASE.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/standard.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/zkclient-0.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/zookeeper-3.4.5.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jxl.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/quartz-2.2.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/quartz-jobs-2.2.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/poi-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/poi-excelant-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/poi-ooxml-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/poi-ooxml-schemas-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/poi-scratchpad-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/spring-aop-4.1.6.RELEASE.jar" sourcepath="C:/Users/Admin/.m2/repository/org/springframework/spring-aop/4.1.6.RELEASE/spring-aop-4.1.6.RELEASE-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libs"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-fileupload-1.2.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/json_simple-1.1.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/rt.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/server-sdk-java"/>
+	<classpathentry kind="lib" path="/libs/lib/alipay-sdk-java20170511115337.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/httpclient-4.5.2.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/MobCommons-2017.0321.1624.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/MobTools-2017.0321.1624.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/SMSSDK-2.1.4.jar"/>
+	<classpathentry kind="lib" path="/libs/lib/jpush-client-3.2.17.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jpush-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>

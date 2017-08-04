@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.AreaDao">
+
+	<resultMap id="tSysAreaResultMap" type="com.bluemobi.po.Area">
+		<id property="areaid" column="areaid" />
+		<result property="areaname" column="areaname" />
+		<result property="parentid" column="parentid" />
+		<result property="userid" column="userid" />
+		<result property="createtime" column="createtime" />
+	</resultMap>
+
+	<!-- app城市列表 -->
+	<select id="getArea" parameterType="map" resultType="map">
+		select
+		areaid,areaname from e_sys_area where parentid=#{areaId} and
+		areaEng=#{areaEng}
+	</select>
+
+	<!-- app热门城市列表 -->
+	<select id="getHotCity" parameterType="map" resultType="map">
+		select
+		a.areaid,a.areaname,b.cityid,b.cityname from e_sys_area a
+		right join
+		(select areaid as cityid,parentid,areaname as cityname from e_sys_area
+		where
+		areaEng=#{areaEng} and hotcityid=#{hotCityId})b
+		on
+		b.parentid=a.areaid
+	</select>
+
+
+	<!-- 后台获取地区列表 xiaojin_wu -->
+	<select id="getList" parameterType="map" resultType="map">
+
+		SELECT
+		*
+		FROM
+		(
+		SELECT
+		areaid,
+		areaname,
+		areaEng,
+		(
+		SELECT
+		areaname
+		FROM
+		e_sys_area a
+		WHERE
+		a.areaid = t.parentid
+		) parentname,
+		(
+		SELECT
+		languagename
+		FROM
+		e_sys_language b
+		WHERE
+		b.languageid = t.areaid
+		) languagename,
+		hotcityid
+		FROM
+		e_sys_area t ORDER BY parentid asc
+		) area
+		limit #{offset},#{rows}
+	</select>
+
+	<select id="getAreaListCounts" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		e_sys_area a
+	</select>
+
+	<insert id="save" parameterType="com.bluemobi.po.Area">
+		INSERT INTO e_sys_area (
+		areaname,
+		areaEng,
+		parentid,
+		languageid,
+		hotcityid
+		)
+		VALUES
+		(
+		#{areaname},
+		#{areaEng},
+		#{parentid},
+		#{languageid},
+		#{hotcityid}
+		)
+
+	</insert>
+
+	<!-- 获取父级地区列表 xiaojin_wu -->
+	<select id="getParentList" resultType="map">
+		SELECT areaid,areaname,areaEng FROM e_sys_area WHERE parentid=0
+	</select>
+	
+	<!-- 删除地区 xiaojin_wu -->
+	<delete id="delete" parameterType="map">
+	   delete from 
+	     e_sys_area 
+	   where 
+	    areaid=#{areaid} 
+	</delete>
+</mapper> 

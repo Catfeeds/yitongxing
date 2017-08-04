@@ -1,0 +1,12 @@
+管理终端连接密码：373965
+
+SSH&SFTP账号：root密码：As123456
+
+
+easiertranslation
+etranslate150923
+
+
+数据库（暂时没有公网权限）
+translate
+As123456

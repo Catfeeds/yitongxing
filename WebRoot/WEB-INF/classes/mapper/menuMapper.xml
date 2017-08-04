@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.bluemobi.dao.MenuDao">
+
+	<resultMap id="tSysMenuResultMap" type="com.bluemobi.po.Menu">
+		<id property="menuid" column="menuid" />
+		<result property="parentid" column="parentid" />
+		<result property="title" column="title" />
+		<result property="link" column="link" />
+		<result property="icon" column="icon" />
+		<result property="iconBg" column="icon_bg" />
+		<result property="sort" column="sort" />
+		<result property="status" column="status" />
+		<result property="ctime" column="ctime" />
+	</resultMap>
+
+	<insert id="insert" parameterType="com.bluemobi.po.Menu">
+	   insert into t_sys_menu (
+	     menuid,
+	     parentid,
+	     title,
+	     link,
+	     icon,
+	     icon_bg,
+	     sort,
+	     status,
+	     ctime
+	   )values (
+	     #{menuid},
+	     #{parentid},
+	     #{title},
+	     #{link},
+	     #{icon},
+	     #{iconBg},
+	     #{sort},
+	     #{status},
+	     #{ctime}
+	   )
+	</insert>
+
+	<update id="update" parameterType="com.bluemobi.po.Menu">
+	   update t_sys_menu set
+	     menuid=#{menuid},
+	     parentid=#{parentid},
+	     title=#{title},
+	     link=#{link},
+	     icon=#{icon},
+	     icon_bg=#{iconBg},
+	     sort=#{sort},
+	     status=#{status},
+	     ctime=#{ctime}
+	   where 
+	    menuid=#{menuid} 
+	</update>
+
+	<select id="getAllMenu" parameterType="map" resultMap="tSysMenuResultMap">
+	   select 
+	     m.menuid,
+	     m.parentid,
+	     m.title,
+	     m.link,
+	     m.icon,
+	     m.icon_bg,
+	     m.sort,
+	     m.status,
+	     m.ctime
+	   from t_sys_menu_user r left join t_sys_menu m on r.menuid=m.menuid and m.status=1 where r.userid=#{userid} order by sort asc
+	</select>
+	
+	<select id="page" parameterType="map" resultMap="tSysMenuResultMap">
+	   select 
+	     menuid,
+	     parentid,
+	     title,
+	     link,
+	     icon,
+	     icon_bg,
+	     sort,
+	     status,
+	     ctime
+	   from t_sys_menu
+	   <where>
+	     <if test="menuid != null">
+	        menuid=#{menuid}
+	     </if>
+	     <if test="parentid != null">
+	        and parentid=#{parentid}
+	     </if>
+	     <if test="title != null">
+	        and title=#{title}
+	     </if>
+	     <if test="link != null">
+	        and link=#{link}
+	     </if>
+	     <if test="icon != null">
+	        and icon=#{icon}
+	     </if>
+	     <if test="iconBg != null">
+	        and icon_bg=#{iconBg}
+	     </if>
+	     <if test="sort != null">
+	        and sort=#{sort}
+	     </if>
+	     <if test="status != null">
+	        and status=#{status}
+	     </if>
+	     <if test="ctime != null">
+	        and ctime=#{ctime}
+	     </if>
+	   </where>
+	</select>
+	
+	<!-- 获取菜单 -->
+	<select id="getListMenu" parameterType="map" resultMap="tSysMenuResultMap">
+	   select 
+	  t1.menuid,
+	  <if test="userid != null and userid != '' ">
+	  	(SELECT t3.menuid from t_sys_menu_user t3 where t3.userid=#{userid} and t3.menuid=t1.menuid) link,
+	  </if>
+	  t1.title
+	  from t_sys_menu t1
+	  where t1.status='1' and t1.parentid=#{id}
+	  order by t1.sort ASC
+	</select>
+	
+	<!-- 加入权限 -->
+	<insert id="insertMenuUser" parameterType="map">
+		insert into t_sys_menu_user (
+	     userid,
+	     menuid
+	   )values (
+	     #{userid},
+	     #{menuid}
+	   )
+	</insert>
+	
+	<delete id="deleteMenu" parameterType="map">
+		delete FROM t_sys_menu_user where userid=#{userid}
+	</delete>
+</mapper> 
